@@ -3,106 +3,555 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Демо: Калькулятор вартості послуг</title>
+  <title>Розрахунок вартості зйомки</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .card { background: white; border-radius: 16px; box-shadow: 0 4px 32px rgba(124,58,237,0.12); width: 100%; max-width: 480px; overflow: hidden; }
-    .card-header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 24px 28px; }
-    .card-header h1 { font-size: 1.3em; font-weight: 700; margin-bottom: 4px; }
-    .card-header p { opacity: 0.8; font-size: 0.9em; }
-    .card-body { padding: 28px; }
-    label { display: block; font-size: 0.88em; color: #6b7280; margin-bottom: 6px; margin-top: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-    label:first-child { margin-top: 0; }
-    select, input[type=number] { width: 100%; padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 1em; color: #1f2937; background: #fafafa; transition: border-color 0.2s; outline: none; }
-    select:focus, input:focus { border-color: #7c3aed; background: white; }
-    .range-row { display: flex; align-items: center; gap: 12px; }
-    .range-row input[type=range] { flex: 1; accent-color: #7c3aed; }
-    .range-val { font-weight: 700; color: #7c3aed; min-width: 32px; text-align: right; }
-    .checkboxes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
-    .checkbox-item { display: flex; align-items: center; gap: 6px; background: #f3f0ff; border-radius: 8px; padding: 8px 12px; cursor: pointer; transition: background 0.15s; }
-    .checkbox-item:hover { background: #ede9fe; }
-    .checkbox-item input { accent-color: #7c3aed; width: 16px; height: 16px; }
-    .checkbox-item span { font-size: 0.9em; color: #374151; }
-    .result-block { background: linear-gradient(135deg, #f3f0ff, #ede9fe); border-radius: 12px; padding: 20px; margin-top: 24px; text-align: center; }
-    .result-label { font-size: 0.85em; color: #6b7280; margin-bottom: 4px; }
-    .result-price { font-size: 2.5em; font-weight: 800; color: #7c3aed; }
-    .result-breakdown { font-size: 0.82em; color: #9ca3af; margin-top: 6px; }
-    .btn { display: block; width: 100%; margin-top: 20px; padding: 14px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-    .btn:hover { background: #6d28d9; }
-    .demo-note { text-align: center; font-size: 0.78em; color: #9ca3af; margin-top: 12px; }
-    a { color: #7c3aed; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #6d28d9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: #ffffff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #7c3aed;
+      padding: 32px 36px;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+
+    /* ── Body ── */
+    .body {
+      padding: 32px 36px 36px;
+    }
+
+    /* ── Field group ── */
+    .field {
+      margin-bottom: 28px;
+    }
+
+    .field:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* ── Select ── */
+    select {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #1f2937;
+      background: #ffffff;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237c3aed' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.18s;
+    }
+
+    select:focus {
+      border-color: #7c3aed;
+    }
+
+    /* ── Custom slider ── */
+    .slider-wrap {
+      position: relative;
+      height: 36px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .slider-track {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+    }
+
+    .slider-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: #7c3aed;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    .slider-thumb {
+      position: absolute;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #7c3aed;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.45);
+      transform: translate(-50%, -50%);
+      transition: box-shadow 0.15s, transform 0.1s;
+      pointer-events: none;
+    }
+
+    .slider-wrap:active .slider-thumb,
+    .slider-wrap.dragging .slider-thumb {
+      transform: translate(-50%, -50%) scale(1.18);
+      box-shadow: 0 3px 12px rgba(124, 58, 237, 0.55);
+    }
+
+    .slider-ticks {
+      position: relative;
+      height: 20px;
+      margin-top: 6px;
+    }
+
+    .slider-tick {
+      position: absolute;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #c4b5fd;
+      transition: color 0.15s, font-weight 0.15s;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .slider-tick.active {
+      color: #7c3aed;
+      font-weight: 700;
+    }
+
+    /* ── Radio options ── */
+    .radio-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .radio-option {
+      position: relative;
+    }
+
+    .radio-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .radio-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 14px 12px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
+      text-align: center;
+    }
+
+    .radio-label:hover {
+      border-color: #c4b5fd;
+      background: #faf5ff;
+    }
+
+    .radio-option input:checked + .radio-label {
+      border-color: #7c3aed;
+      background: #f5f3ff;
+    }
+
+    .radio-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .radio-option input:checked + .radio-label .radio-name {
+      color: #7c3aed;
+    }
+
+    .radio-note {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: #f3f4f6;
+      margin: 28px 0;
+    }
+
+    /* ── Result ── */
+    .result {
+      background: #7c3aed;
+      border-radius: 14px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .result-meta {
+      flex: 1;
+    }
+
+    .result-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+      margin-bottom: 6px;
+    }
+
+    .result-desc {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.4;
+    }
+
+    .result-price {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .result-currency {
+      font-size: 22px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1;
+    }
+
+    .result-amount {
+      font-size: 42px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    /* ── Button ── */
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: #1f2937;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s;
+      letter-spacing: 0.01em;
+    }
+
+    .btn:hover {
+      background: #111827;
+    }
+
+    /* ── Success state ── */
+    .success {
+      display: none;
+      text-align: center;
+      padding: 20px 0 8px;
+    }
+
+    .success-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #7c3aed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .success-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .success h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .success p {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.55;
+    }
+
+    .success-again {
+      display: inline-block;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #7c3aed;
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-weight: 600;
+    }
+
+    /* ── Back link ── */
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #9ca3af;
+      text-decoration: none;
+    }
+
+    .back:hover {
+      color: #7c3aed;
+    }
   </style>
 </head>
 <body>
+
 <div class="card">
-  <div class="card-header">
-    <h1>🧮 Калькулятор вартості</h1>
-    <p>Підберіть параметри та дізнайтеся вартість</p>
+
+  <div class="header">
+    <h1>Розрахунок вартості зйомки</h1>
   </div>
-  <div class="card-body">
-    <label>Тип послуги</label>
-    <select id="service" onchange="calc()">
-      <option value="500">Telegram-бот (базовий) — від 500 ₴</option>
-      <option value="1200">Telegram FAQ-бот — від 1200 ₴</option>
-      <option value="800">Форма заявок — від 800 ₴</option>
-      <option value="1000">Калькулятор на сайт — від 1000 ₴</option>
-      <option value="1500">Прайс-лист інтерактивний — від 1500 ₴</option>
-      <option value="900">Календар бронювання — від 900 ₴</option>
-      <option value="700">Чат-віджет — від 700 ₴</option>
-    </select>
 
-    <label>Складність (1 — просто, 5 — складно)</label>
-    <div class="range-row">
-      <input type="range" id="complexity" min="1" max="5" value="2" oninput="this.nextElementSibling.textContent=this.value;calc()">
-      <span class="range-val" id="cv">2</span>
+  <div class="body">
+
+    <!-- Field 1: Type -->
+    <div class="field">
+      <span class="field-label">Тип зйомки</span>
+      <select id="shootType" onchange="calc()">
+        <option value="800">Портретна зйомка</option>
+        <option value="1400">Предметна зйомка</option>
+        <option value="2200">Корпоративне фото</option>
+        <option value="3500">Репортаж з події</option>
+      </select>
     </div>
 
-    <label>Терміни</label>
-    <select id="urgency" onchange="calc()">
-      <option value="1">Стандартні (7–14 днів)</option>
-      <option value="1.3">Прискорені (3–5 днів) +30%</option>
-      <option value="1.6">Терміново (1–2 дні) +60%</option>
-    </select>
-
-    <label>Додаткові опції</label>
-    <div class="checkboxes">
-      <label class="checkbox-item"><input type="checkbox" id="support" onchange="calc()"><span>Місяць підтримки +200 ₴</span></label>
-      <label class="checkbox-item"><input type="checkbox" id="design" onchange="calc()"><span>Кастомний дизайн +300 ₴</span></label>
-      <label class="checkbox-item"><input type="checkbox" id="docs" onchange="calc()"><span>Документація +150 ₴</span></label>
+    <!-- Field 2: Duration -->
+    <div class="field">
+      <span class="field-label">Тривалість — <span id="hoursLabel">2 години</span></span>
+      <div class="slider-wrap" id="sliderWrap">
+        <div class="slider-track">
+          <div class="slider-fill" id="sliderFill"></div>
+        </div>
+        <div class="slider-thumb" id="sliderThumb"></div>
+      </div>
+      <div class="slider-ticks" id="sliderTicks"></div>
     </div>
 
-    <div class="result-block">
-      <div class="result-label">Орієнтовна вартість</div>
-      <div class="result-price" id="price">0 ₴</div>
-      <div class="result-breakdown" id="breakdown"></div>
+    <!-- Field 3: Location -->
+    <div class="field">
+      <span class="field-label">Локація</span>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="location" id="locStudio" value="0" checked onchange="calc()">
+          <label class="radio-label" for="locStudio">
+            <span class="radio-name">Студія</span>
+            <span class="radio-note">включено</span>
+          </label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="location" id="locOutdoor" value="600" onchange="calc()">
+          <label class="radio-label" for="locOutdoor">
+            <span class="radio-name">Виїзд</span>
+            <span class="radio-note">+600 грн</span>
+          </label>
+        </div>
+      </div>
     </div>
-    <button class="btn" onclick="order()">📩 Замовити цей проєкт</button>
-    <p class="demo-note">Це демо-версія. <a href="../index.html">Повернутись на сайт</a></p>
+
+    <div class="divider"></div>
+
+    <!-- Result -->
+    <div class="result">
+      <div class="result-meta">
+        <div class="result-title">До сплати</div>
+        <div class="result-desc" id="resultDesc">Портретна, 2 год, студія</div>
+      </div>
+      <div class="result-price"><span class="result-currency">₴</span><span class="result-amount" id="price">1 600</span></div>
+    </div>
+
+    <!-- Main form view -->
+    <div id="formView">
+      <button class="btn" onclick="order()">Замовити</button>
+    </div>
+
+    <!-- Success view -->
+    <div class="success" id="successView">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Заявку прийнято</h2>
+      <p>Дякуємо! Ми зв'яжемося з вами протягом години, щоб підтвердити дату та деталі зйомки.</p>
+      <button class="success-again" onclick="reset()">Розрахувати ще раз</button>
+    </div>
+
+    <a class="back" href="../index.html">Повернутись на сайт</a>
+
   </div>
 </div>
+
 <script>
-function calc() {
-  var base = +document.getElementById('service').value;
-  var comp = +document.getElementById('complexity').value;
-  var urg = +document.getElementById('urgency').value;
-  var support = document.getElementById('support').checked ? 200 : 0;
-  var design = document.getElementById('design').checked ? 300 : 0;
-  var docs = document.getElementById('docs').checked ? 150 : 0;
-  var total = Math.round((base * (1 + (comp-1)*0.15) * urg) + support + design + docs);
-  document.getElementById('price').textContent = total.toLocaleString('uk') + ' ₴';
-  var extras = [];
-  if(support) extras.push('підтримка +200₴');
-  if(design) extras.push('дизайн +300₴');
-  if(docs) extras.push('документація +150₴');
-  document.getElementById('breakdown').textContent = extras.length ? extras.join(' · ') : 'Базова комплектація';
-}
-function order() {
-  var service = document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
-  var price = document.getElementById('price').textContent;
-  window.location.href = 'mailto:matthew.korenets@gmail.com?subject=' + encodeURIComponent('Замовлення: ' + service) + '&body=' + encodeURIComponent('Добрий день!\n\nХочу замовити: ' + service + '\nОрієнтовна вартість: ' + price + '\n\nДеталі: ');
-}
-calc();
+  /* ── Custom slider ── */
+  var MIN = 1, MAX = 8, currentHours = 2;
+  var wrap  = document.getElementById('sliderWrap');
+  var fill  = document.getElementById('sliderFill');
+  var thumb = document.getElementById('sliderThumb');
+  var ticks = document.getElementById('sliderTicks');
+
+  function pct(val) { return (val - MIN) / (MAX - MIN); }
+
+  function renderSlider(val) {
+    var p = pct(val) * 100;
+    thumb.style.left = p + '%';
+    fill.style.width  = p + '%';
+    /* update ticks */
+    ticks.querySelectorAll('.slider-tick').forEach(function(t) {
+      t.classList.toggle('active', +t.dataset.val === val);
+    });
+  }
+
+  function buildTicks() {
+    ticks.innerHTML = '';
+    for (var v = MIN; v <= MAX; v++) {
+      var t = document.createElement('span');
+      t.className = 'slider-tick';
+      t.dataset.val = v;
+      t.textContent = v === MIN ? '1 год' : v === MAX ? '8 год' : String(v);
+      t.style.left = pct(v) * 100 + '%';
+      (function(val){ t.addEventListener('click', function(){ setValue(val); }); })(v);
+      ticks.appendChild(t);
+    }
+  }
+
+  function setValue(val) {
+    currentHours = val;
+    renderSlider(val);
+    updateHours();
+    calc();
+  }
+
+  function posToVal(clientX) {
+    var rect = wrap.getBoundingClientRect();
+    var ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return Math.round(MIN + ratio * (MAX - MIN));
+  }
+
+  var dragging = false;
+  wrap.addEventListener('mousedown', function(e) {
+    dragging = true;
+    wrap.classList.add('dragging');
+    setValue(posToVal(e.clientX));
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (dragging) setValue(posToVal(e.clientX));
+  });
+  document.addEventListener('mouseup', function() {
+    dragging = false;
+    wrap.classList.remove('dragging');
+  });
+  wrap.addEventListener('touchstart', function(e) {
+    dragging = true;
+    setValue(posToVal(e.touches[0].clientX));
+  }, { passive: true });
+  document.addEventListener('touchmove', function(e) {
+    if (dragging) setValue(posToVal(e.touches[0].clientX));
+  }, { passive: true });
+  document.addEventListener('touchend', function() { dragging = false; });
+
+  /* ── Types ── */
+  var types = {
+    800:  'Портретна',
+    1400: 'Предметна',
+    2200: 'Корпоративне фото',
+    3500: 'Репортаж'
+  };
+
+  function updateHours() {
+    var h = currentHours;
+    document.getElementById('hoursLabel').textContent =
+      h + (h === 1 ? ' година' : h < 5 ? ' години' : ' годин');
+  }
+
+  function calc() {
+    var base  = +document.getElementById('shootType').value;
+    var loc   = +document.querySelector('input[name="location"]:checked').value;
+    var total = base + (currentHours - 1) * Math.round(base * 0.35) + loc;
+    var locName = loc === 0 ? 'студія' : 'виїзд';
+    document.getElementById('price').textContent = total.toLocaleString('uk');
+    document.getElementById('resultDesc').textContent =
+      types[base] + ', ' + currentHours + ' год, ' + locName;
+  }
+
+  function order() {
+    document.getElementById('formView').style.display    = 'none';
+    document.getElementById('successView').style.display = 'block';
+  }
+
+  function reset() {
+    document.getElementById('formView').style.display    = 'block';
+    document.getElementById('successView').style.display = 'none';
+  }
+
+  buildTicks();
+  renderSlider(currentHours);
+  updateHours();
+  calc();
 </script>
+
 </body>
 </html>
