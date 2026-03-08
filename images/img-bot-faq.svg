@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#f8f7ff"/>
+  <rect x="250" y="20" width="300" height="460" rx="30" fill="white" stroke="#e8e0f5" stroke-width="2"/>
+  <rect x="250" y="20" width="300" height="70" rx="30" fill="#5b21b6"/>
+  <rect x="250" y="66" width="300" height="24" fill="#5b21b6"/>
+  <text x="400" y="52" font-family="Arial" font-size="14" fill="white" font-weight="bold" text-anchor="middle">FAQ Бот</text>
+  <text x="400" y="68" font-family="Arial" font-size="11" fill="rgba(255,255,255,0.7)" text-anchor="middle">відповідає автоматично</text>
+  <!-- FAQ items as buttons -->
+  <rect x="265" y="105" width="270" height="44" rx="10" fill="#f3f0ff" stroke="#d8b4fe"/>
+  <text x="275" y="123" font-family="Arial" font-size="12" fill="#5b21b6">❓ Скільки коштує?</text>
+  <text x="275" y="140" font-family="Arial" font-size="11" fill="#6b7280">Натисніть для відповіді</text>
+  <rect x="265" y="160" width="270" height="44" rx="10" fill="#7c3aed"/>
+  <text x="275" y="178" font-family="Arial" font-size="12" fill="white">❓ Які терміни?</text>
+  <text x="275" y="194" font-family="Arial" font-size="11" fill="rgba(255,255,255,0.8)">Натисніть для відповіді</text>
+  <rect x="265" y="215" width="270" height="60" rx="10" fill="#f9f5ff" stroke="#e9d5ff"/>
+  <text x="275" y="233" font-family="Arial" font-size="12" fill="#374151" font-weight="bold">💬 Відповідь:</text>
+  <text x="275" y="250" font-family="Arial" font-size="12" fill="#374151">Вартість від 500 грн.</text>
+  <text x="275" y="265" font-family="Arial" font-size="11" fill="#6b7280">Залежить від складності.</text>
+  <rect x="265" y="287" width="270" height="44" rx="10" fill="#f3f0ff" stroke="#d8b4fe"/>
+  <text x="275" y="305" font-family="Arial" font-size="12" fill="#5b21b6">❓ Як зв'язатись?</text>
+  <text x="275" y="321" font-family="Arial" font-size="11" fill="#6b7280">Натисніть для відповіді</text>
+  <rect x="265" y="342" width="270" height="44" rx="10" fill="#f3f0ff" stroke="#d8b4fe"/>
+  <text x="275" y="360" font-family="Arial" font-size="12" fill="#5b21b6">❓ Що входить у послугу?</text>
+  <text x="275" y="376" font-family="Arial" font-size="11" fill="#6b7280">Натисніть для відповіді</text>
+  <!-- Input -->
+  <rect x="260" y="430" width="220" height="36" rx="18" fill="#f3f4f6"/>
+  <text x="275" y="453" font-family="Arial" font-size="12" fill="#9ca3af">Запитайте щось...</text>
+  <circle cx="498" cy="448" r="16" fill="#7c3aed"/>
+  <text x="498" y="454" font-family="Arial" font-size="14" fill="white" text-anchor="middle">➤</text>
+</svg>

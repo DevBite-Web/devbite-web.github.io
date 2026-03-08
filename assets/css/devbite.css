@@ -1,0 +1,99 @@
+/* DevBite custom styles */
+
+/* Features section - center icons and align text */
+#two .features section {
+    text-align: center;
+}
+#two .features .icon {
+    display: block;
+    margin: 0 auto 1em auto;
+}
+
+/* Project page action buttons */
+.actions.project-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8em;
+    margin-top: 1.5em;
+}
+
+/* Demo modal overlay */
+.demo-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+.demo-overlay.active {
+    display: flex;
+}
+.demo-container {
+    background: #fff;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.demo-header {
+    background: #7c3aed;
+    color: white;
+    padding: 1em 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.demo-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 1.1em;
+}
+.demo-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.demo-frame {
+    flex: 1;
+    border: none;
+    width: 100%;
+    height: 600px;
+}
+
+/* AI notice box */
+.ai-notice {
+    background: #f9f5ff;
+    border-left: 4px solid #7c3aed;
+    padding: 1em 1.5em;
+    margin: 1.5em 0;
+    border-radius: 0 8px 8px 0;
+    color: #4c1d95;
+    font-size: 0.95em;
+}
+
+/* Spotlight button extras */
+.spotlight-actions {
+    display: flex;
+    gap: 0.6em;
+    flex-wrap: wrap;
+    margin-top: 0.8em;
+}
+.button.small-btn {
+    font-size: 0.75em;
+    padding: 0.45em 1.2em;
+}
+
+/* Fix: remove HTML5UP reference from footer */
+.menu li a[href*="html5up"] {
+    display: none;
+}

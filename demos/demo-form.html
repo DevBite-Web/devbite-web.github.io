@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html lang="uk">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Демо: Форма заявок</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: white; border-radius: 16px; box-shadow: 0 4px 32px rgba(124,58,237,0.12); width: 100%; max-width: 500px; overflow: hidden; }
+    .card-header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 24px 28px; }
+    .card-header h1 { font-size: 1.3em; font-weight: 700; margin-bottom: 4px; }
+    .card-header p { opacity: 0.8; font-size: 0.9em; }
+    .card-body { padding: 28px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.82em; color: #6b7280; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .req { color: #7c3aed; }
+    .field input, .field select, .field textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 0.95em; color: #1f2937; background: white; transition: border-color 0.2s, box-shadow 0.2s; outline: none; font-family: inherit; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.08); }
+    .field.error input, .field.error select, .field.error textarea { border-color: #ef4444; }
+    .field .err-msg { font-size: 0.78em; color: #ef4444; margin-top: 4px; display: none; }
+    .field.error .err-msg { display: block; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field textarea { resize: none; height: 100px; }
+    .btn { display: block; width: 100%; padding: 14px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 4px; }
+    .btn:hover { background: #6d28d9; }
+    .success-block { display: none; text-align: center; padding: 30px; }
+    .success-icon { font-size: 3em; margin-bottom: 12px; }
+    .success-block h2 { color: #374151; font-size: 1.2em; margin-bottom: 8px; }
+    .success-block p { color: #6b7280; font-size: 0.9em; }
+    .reset-btn { margin-top: 20px; background: none; border: 1.5px solid #7c3aed; color: #7c3aed; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
+    .note { text-align:center; font-size:0.78em; color:#9ca3af; margin-top:14px; }
+    a { color: #7c3aed; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <h1>📋 Форма заявки</h1>
+    <p>Заповніть форму — ми зв'яжемося з вами</p>
+  </div>
+  <div id="formBlock" class="card-body">
+    <div class="row-2">
+      <div class="field" id="f-name">
+        <label>Ім'я <span class="req">*</span></label>
+        <input id="name" type="text" placeholder="Ваше ім'я" />
+        <div class="err-msg">Будь ласка, введіть ім'я</div>
+      </div>
+      <div class="field" id="f-phone">
+        <label>Телефон</label>
+        <input id="phone" type="tel" placeholder="+38 (0__) ___-__-__" />
+      </div>
+    </div>
+    <div class="field" id="f-email">
+      <label>Email <span class="req">*</span></label>
+      <input id="email" type="email" placeholder="your@email.com" />
+      <div class="err-msg">Введіть коректний email</div>
+    </div>
+    <div class="field" id="f-service">
+      <label>Послуга <span class="req">*</span></label>
+      <select id="service">
+        <option value="">— Оберіть послугу —</option>
+        <option>Калькулятор вартості</option>
+        <option>Календар бронювання</option>
+        <option>Telegram-бот для заявок</option>
+        <option>FAQ-бот</option>
+        <option>Форма заявок</option>
+        <option>Інтеграція ШІ</option>
+        <option>Прайс-лист</option>
+        <option>Чат-віджет</option>
+        <option>Індивідуальний інструмент</option>
+      </select>
+      <div class="err-msg">Оберіть послугу</div>
+    </div>
+    <div class="field">
+      <label>Коментар</label>
+      <textarea id="comment" placeholder="Опишіть деталі вашого запиту..."></textarea>
+    </div>
+    <button class="btn" onclick="submitForm()">Надіслати заявку →</button>
+    <p class="note"><a href="../index.html">Повернутись на сайт</a></p>
+  </div>
+  <div id="successBlock" class="success-block">
+    <div class="success-icon">✅</div>
+    <h2>Заявку надіслано!</h2>
+    <p>Дякуємо за ваше звернення.<br>Ми зв'яжемося з вами найближчим часом.</p>
+    <button class="reset-btn" onclick="reset()">← Нова заявка</button>
+    <p class="note" style="margin-top:16px"><a href="../index.html">Повернутись на сайт</a></p>
+  </div>
+</div>
+<script>
+function validate(id, checkFn) {
+  var el = document.getElementById(id);
+  var field = document.getElementById('f-' + id);
+  if(!field) return true;
+  if(!checkFn(el.value)) { field.classList.add('error'); return false; }
+  field.classList.remove('error'); return true;
+}
+function submitForm() {
+  var ok = true;
+  ok = validate('name', function(v){ return v.trim().length >= 2; }) && ok;
+  ok = validate('email', function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }) && ok;
+  ok = validate('service', function(v){ return v !== ''; }) && ok;
+  if(!ok) return;
+  var name = document.getElementById('name').value;
+  var email = document.getElementById('email').value;
+  var service = document.getElementById('service').value;
+  var comment = document.getElementById('comment').value;
+  window.location.href = 'mailto:matthew.korenets@gmail.com?subject=' + encodeURIComponent('Заявка: ' + service) + '&body=' + encodeURIComponent('Ім\'я: ' + name + '\nEmail: ' + email + '\nПослуга: ' + service + '\n\n' + comment);
+  document.getElementById('formBlock').style.display = 'none';
+  document.getElementById('successBlock').style.display = 'block';
+}
+function reset() {
+  document.getElementById('formBlock').style.display = 'block';
+  document.getElementById('successBlock').style.display = 'none';
+  ['name','phone','email','comment'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('service').value = '';
+}
+</script>
+</body>
+</html>

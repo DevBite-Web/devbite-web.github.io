@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html lang="uk">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Демо: Календар бронювання</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: white; border-radius: 16px; box-shadow: 0 4px 32px rgba(124,58,237,0.12); width: 100%; max-width: 480px; overflow: hidden; }
+    .cal-header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .cal-header h2 { font-size: 1.15em; font-weight: 700; }
+    .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 1.1em; cursor: pointer; transition: background 0.2s; }
+    .nav-btn:hover { background: rgba(255,255,255,0.35); }
+    .day-names { display: grid; grid-template-columns: repeat(7,1fr); background: #f9f5ff; }
+    .day-name { text-align: center; padding: 10px 0; font-size: 0.8em; color: #7c3aed; font-weight: 600; text-transform: uppercase; }
+    .day-name.weekend { color: #a855f7; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7,1fr); padding: 8px; gap: 4px; }
+    .day { text-align: center; padding: 10px 4px; border-radius: 8px; cursor: pointer; font-size: 0.95em; transition: all 0.15s; user-select: none; }
+    .day.empty { cursor: default; }
+    .day.past { color: #d1d5db; cursor: default; }
+    .day.busy { color: #9ca3af; background: #f3f4f6; cursor: not-allowed; text-decoration: line-through; }
+    .day.available { color: #374151; font-weight: 500; }
+    .day.available:hover { background: #ede9fe; color: #7c3aed; }
+    .day.selected { background: #7c3aed; color: white; font-weight: 700; border-radius: 50%; }
+    .day.today { border: 2px solid #7c3aed; }
+    .legend { display: flex; gap: 16px; padding: 12px 16px; border-top: 1px solid #f3f4f6; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8em; color: #6b7280; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot.avail { background: #7c3aed; }
+    .dot.busy { background: #e5e7eb; border: 1px solid #d1d5db; }
+    .booking-section { padding: 16px 24px 24px; border-top: 1px solid #f3f0ff; }
+    .booking-section h3 { font-size: 1em; font-weight: 700; color: #374151; margin-bottom: 12px; }
+    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .info-row select { flex: 1; padding: 8px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 0.9em; outline: none; }
+    .info-row select:focus { border-color: #7c3aed; }
+    input.name-input { width: 100%; padding: 9px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 0.9em; margin-bottom: 12px; outline: none; }
+    input.name-input:focus { border-color: #7c3aed; }
+    .btn { width: 100%; padding: 13px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #6d28d9; }
+    .btn:disabled { background: #d1d5db; cursor: default; }
+    .success { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 14px; text-align: center; color: #166534; font-size: 0.9em; display: none; }
+    .note { text-align:center; font-size:0.78em; color:#9ca3af; margin-top:10px; }
+    a { color: #7c3aed; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="cal-header">
+    <button class="nav-btn" onclick="prevMonth()">‹</button>
+    <h2 id="monthLabel"></h2>
+    <button class="nav-btn" onclick="nextMonth()">›</button>
+  </div>
+  <div class="day-names">
+    <div class="day-name">Пн</div><div class="day-name">Вт</div><div class="day-name">Ср</div>
+    <div class="day-name">Чт</div><div class="day-name">Пт</div>
+    <div class="day-name weekend">Сб</div><div class="day-name weekend">Нд</div>
+  </div>
+  <div class="calendar-grid" id="grid"></div>
+  <div class="legend">
+    <div class="legend-item"><div class="dot avail"></div> Вільно</div>
+    <div class="legend-item"><div class="dot busy"></div> Зайнято</div>
+  </div>
+  <div class="booking-section">
+    <h3 id="bookingTitle">Оберіть дату для запису</h3>
+    <div id="bookingForm" style="display:none">
+      <input class="name-input" id="clientName" placeholder="Ваше ім'я" />
+      <div class="info-row">
+        <select id="timeSlot">
+          <option>09:00</option><option>10:00</option><option>11:00</option>
+          <option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option>
+        </select>
+      </div>
+      <button class="btn" onclick="book()">Підтвердити запис</button>
+    </div>
+    <div class="success" id="success">✅ Запис підтверджено! Чекаємо вас у вказаний час.</div>
+    <p class="note"><a href="../index.html">Повернутись на сайт</a></p>
+  </div>
+</div>
+<script>
+var now = new Date();
+var cur = {year: now.getFullYear(), month: now.getMonth()};
+// Busy days relative to today
+var busyDays = [3,7,8,14,15,21,22];
+var selected = null;
+var months = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+
+function render() {
+  document.getElementById('monthLabel').textContent = months[cur.month] + ' ' + cur.year;
+  var grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  var first = new Date(cur.year, cur.month, 1).getDay();
+  var offset = (first === 0) ? 6 : first - 1;
+  var days = new Date(cur.year, cur.month+1, 0).getDate();
+  for(var i=0;i<offset;i++) { var e=document.createElement('div'); e.className='day empty'; grid.appendChild(e); }
+  for(var d=1;d<=days;d++) {
+    var el = document.createElement('div');
+    el.textContent = d;
+    var isPast = (cur.year < now.getFullYear()) || (cur.year === now.getFullYear() && cur.month < now.getMonth()) || (cur.year === now.getFullYear() && cur.month === now.getMonth() && d < now.getDate());
+    var isBusy = busyDays.includes(d);
+    var isToday = cur.year === now.getFullYear() && cur.month === now.getMonth() && d === now.getDate();
+    if(isPast) { el.className = 'day past'; }
+    else if(isBusy) { el.className = 'day busy'; }
+    else {
+      el.className = 'day available' + (isToday ? ' today' : '') + (selected===d ? ' selected' : '');
+      el.onclick = (function(day){ return function(){ selectDay(day); }; })(d);
+    }
+    grid.appendChild(el);
+  }
+}
+function selectDay(d) {
+  selected = d;
+  render();
+  document.getElementById('bookingTitle').textContent = 'Запис на ' + d + ' ' + months[cur.month];
+  document.getElementById('bookingForm').style.display = 'block';
+  document.getElementById('success').style.display = 'none';
+}
+function book() {
+  var name = document.getElementById('clientName').value.trim();
+  if(!name) { document.getElementById('clientName').focus(); return; }
+  document.getElementById('bookingForm').style.display = 'none';
+  document.getElementById('success').style.display = 'block';
+  document.getElementById('bookingTitle').textContent = 'Записано!';
+}
+function prevMonth() { cur.month--; if(cur.month<0){cur.month=11;cur.year--;} selected=null; render(); resetForm(); }
+function nextMonth() { cur.month++; if(cur.month>11){cur.month=0;cur.year++;} selected=null; render(); resetForm(); }
+function resetForm() { document.getElementById('bookingForm').style.display='none'; document.getElementById('success').style.display='none'; document.getElementById('bookingTitle').textContent='Оберіть дату для запису'; }
+render();
+</script>
+</body>
+</html>

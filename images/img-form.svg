@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#f8f7ff"/>
+  <rect x="150" y="30" width="500" height="440" rx="16" fill="white" stroke="#e8e0f5" stroke-width="1.5"/>
+  <rect x="150" y="30" width="500" height="60" rx="16" fill="#7c3aed"/>
+  <rect x="150" y="68" width="500" height="22" fill="#7c3aed"/>
+  <text x="400" y="66" font-family="Arial" font-size="17" fill="white" font-weight="bold" text-anchor="middle">Форма заявки</text>
+  <text x="180" y="115" font-family="Arial" font-size="12" fill="#6b7280">Ім'я *</text>
+  <rect x="180" y="122" width="440" height="38" rx="8" fill="white" stroke="#d8b4fe" stroke-width="1.5"/>
+  <text x="195" y="146" font-family="Arial" font-size="13" fill="#374151">Іван Петренко</text>
+  <text x="180" y="182" font-family="Arial" font-size="12" fill="#6b7280">Email *</text>
+  <rect x="180" y="189" width="440" height="38" rx="8" fill="white" stroke="#d8b4fe" stroke-width="1.5"/>
+  <text x="195" y="213" font-family="Arial" font-size="13" fill="#374151">ivan@example.com</text>
+  <text x="180" y="249" font-family="Arial" font-size="12" fill="#6b7280">Телефон</text>
+  <rect x="180" y="256" width="440" height="38" rx="8" fill="white" stroke="#e5e7eb" stroke-width="1.5"/>
+  <text x="195" y="280" font-family="Arial" font-size="13" fill="#9ca3af">+38 (0__) ___-__-__</text>
+  <text x="180" y="316" font-family="Arial" font-size="12" fill="#6b7280">Послуга *</text>
+  <rect x="180" y="323" width="440" height="38" rx="8" fill="white" stroke="#d8b4fe" stroke-width="1.5"/>
+  <text x="195" y="347" font-family="Arial" font-size="13" fill="#374151">Telegram-бот для FAQ</text>
+  <text x="608" y="347" font-family="Arial" font-size="14" fill="#7c3aed">▾</text>
+  <text x="180" y="383" font-family="Arial" font-size="12" fill="#6b7280">Коментар</text>
+  <rect x="180" y="390" width="440" height="50" rx="8" fill="white" stroke="#e5e7eb" stroke-width="1.5"/>
+  <text x="195" y="412" font-family="Arial" font-size="12" fill="#9ca3af">Опишіть вашу задачу...</text>
+  <rect x="180" y="455" width="440" height="44" rx="10" fill="#7c3aed"/>
+  <text x="400" y="482" font-family="Arial" font-size="15" fill="white" font-weight="bold" text-anchor="middle">Надіслати заявку →</text>
+</svg>

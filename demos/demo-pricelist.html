@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html lang="uk">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Демо: Прайс-лист</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; padding: 30px 20px; }
+    h1 { text-align: center; color: #1f2937; font-size: 1.8em; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: #6b7280; margin-bottom: 24px; font-size: 0.95em; }
+    .toggle-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 32px; }
+    .toggle-label { color: #6b7280; font-size: 0.9em; font-weight: 600; }
+    .toggle-label.active { color: #7c3aed; }
+    .toggle { width: 52px; height: 28px; background: #7c3aed; border-radius: 14px; cursor: pointer; position: relative; transition: background 0.2s; }
+    .toggle-knob { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .toggle.yearly .toggle-knob { transform: translateX(24px); }
+    .badge { background: #d1fae5; color: #065f46; font-size: 0.72em; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+    .cards { display: flex; gap: 20px; max-width: 900px; margin: 0 auto; flex-wrap: wrap; justify-content: center; }
+    .card { background: white; border: 2px solid #e5e7eb; border-radius: 20px; padding: 28px 24px; flex: 1; min-width: 220px; max-width: 260px; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,58,237,0.12); }
+    .card.popular { border-color: #7c3aed; transform: scale(1.03); box-shadow: 0 8px 32px rgba(124,58,237,0.2); }
+    .popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; font-size: 0.75em; font-weight: 700; padding: 4px 16px; border-radius: 20px; white-space: nowrap; }
+    .plan-name { font-size: 1.1em; font-weight: 700; color: #374151; margin-bottom: 6px; }
+    .plan-desc { font-size: 0.82em; color: #9ca3af; margin-bottom: 20px; }
+    .price { font-size: 2.4em; font-weight: 800; color: #7c3aed; line-height: 1; }
+    .price sup { font-size: 0.4em; vertical-align: top; margin-top: 0.4em; color: #9ca3af; }
+    .price-period { font-size: 0.8em; color: #9ca3af; margin-bottom: 20px; margin-top: 4px; }
+    .features { list-style: none; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .features li { font-size: 0.87em; color: #374151; display: flex; align-items: center; gap: 8px; }
+    .features li .check { color: #7c3aed; font-weight: 700; font-size: 1em; }
+    .features li .cross { color: #d1d5db; }
+    .btn { display: block; width: 100%; padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; border: 2px solid #7c3aed; background: white; color: #7c3aed; transition: all 0.2s; text-align: center; text-decoration: none; }
+    .btn:hover, .card.popular .btn { background: #7c3aed; color: white; }
+    .note { text-align:center; font-size:0.78em; color:#9ca3af; margin-top:24px; }
+    a { color: #7c3aed; }
+  </style>
+</head>
+<body>
+  <h1>Прайс-лист</h1>
+  <p class="subtitle">Оберіть план, що підходить для вашого бізнесу</p>
+
+  <div class="toggle-row">
+    <span class="toggle-label active" id="monthLabel">Одноразово</span>
+    <div class="toggle" id="toggleBtn" onclick="togglePeriod()">
+      <div class="toggle-knob"></div>
+    </div>
+    <span class="toggle-label" id="yearLabel">З підтримкою</span>
+    <span class="badge" id="saveBadge" style="display:none">Економія 20%</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="plan-name">Стартовий</div>
+      <div class="plan-desc">Для простих задач</div>
+      <div class="price"><sup>₴</sup><span id="p1">500</span></div>
+      <div class="price-period" id="pp1">одноразово</div>
+      <ul class="features">
+        <li><span class="check">✓</span> 1 основна функція</li>
+        <li><span class="check">✓</span> Базова підтримка</li>
+        <li><span class="check">✓</span> Готовий файл</li>
+        <li><span class="cross">✗</span> Доопрацювання</li>
+        <li><span class="cross">✗</span> Документація</li>
+      </ul>
+      <a href="mailto:matthew.korenets@gmail.com?subject=Замовлення: Стартовий план" class="btn">Обрати план</a>
+    </div>
+
+    <div class="card popular">
+      <div class="popular-badge">✦ ПОПУЛЯРНИЙ</div>
+      <div class="plan-name">Оптимальний</div>
+      <div class="plan-desc">Найкращий вибір</div>
+      <div class="price"><sup>₴</sup><span id="p2">1500</span></div>
+      <div class="price-period" id="pp2">одноразово</div>
+      <ul class="features">
+        <li><span class="check">✓</span> До 5 функцій</li>
+        <li><span class="check">✓</span> Пріоритетна підтримка</li>
+        <li><span class="check">✓</span> Готовий файл</li>
+        <li><span class="check">✓</span> 1 доопрацювання</li>
+        <li><span class="cross">✗</span> Документація</li>
+      </ul>
+      <a href="mailto:matthew.korenets@gmail.com?subject=Замовлення: Оптимальний план" class="btn">Обрати план</a>
+    </div>
+
+    <div class="card">
+      <div class="plan-name">Преміум</div>
+      <div class="plan-desc">Повний пакет</div>
+      <div class="price"><sup>₴</sup><span id="p3">3000</span></div>
+      <div class="price-period" id="pp3">одноразово</div>
+      <ul class="features">
+        <li><span class="check">✓</span> Без обмежень</li>
+        <li><span class="check">✓</span> 3 місяці підтримки</li>
+        <li><span class="check">✓</span> Готовий файл</li>
+        <li><span class="check">✓</span> 3 доопрацювання</li>
+        <li><span class="check">✓</span> Документація</li>
+      </ul>
+      <a href="mailto:matthew.korenets@gmail.com?subject=Замовлення: Преміум план" class="btn">Обрати план</a>
+    </div>
+  </div>
+  <p class="note"><a href="../index.html">← Повернутись на сайт</a></p>
+<script>
+var yearly = false;
+var prices = { monthly:[500,1500,3000], yearly:[400,1200,2400] };
+function togglePeriod(){
+  yearly = !yearly;
+  var btn = document.getElementById('toggleBtn');
+  btn.classList.toggle('yearly', yearly);
+  document.getElementById('monthLabel').classList.toggle('active', !yearly);
+  document.getElementById('yearLabel').classList.toggle('active', yearly);
+  document.getElementById('saveBadge').style.display = yearly ? 'inline' : 'none';
+  var p = yearly ? prices.yearly : prices.monthly;
+  var period = yearly ? '/міс (з підтримкою)' : 'одноразово';
+  [1,2,3].forEach(function(i){ document.getElementById('p'+i).textContent=p[i-1]; document.getElementById('pp'+i).textContent=period; });
+}
+</script>
+</body>
+</html>

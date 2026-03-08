@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#f8f7ff"/>
+  <rect x="80" y="30" width="640" height="440" rx="16" fill="white" stroke="#e8e0f5" stroke-width="1.5"/>
+  <rect x="80" y="30" width="640" height="60" rx="16" fill="#4c1d95"/>
+  <rect x="80" y="66" width="640" height="24" fill="#4c1d95"/>
+  <text x="400" y="67" font-family="Arial" font-size="17" fill="white" font-weight="bold" text-anchor="middle">🔧 Індивідуальний інструмент</text>
+  <!-- Tool selector -->
+  <text x="110" y="120" font-family="Arial" font-size="13" fill="#6b7280">Тип інструменту:</text>
+  <rect x="110" y="128" width="560" height="40" rx="8" fill="#f9f5ff" stroke="#d8b4fe"/>
+  <text x="125" y="153" font-family="Arial" font-size="13" fill="#5b21b6">Конвертер одиниць вимірювання</text>
+  <text x="650" y="153" font-family="Arial" font-size="14" fill="#7c3aed">▾</text>
+  <!-- Input/output -->
+  <rect x="110" y="185" width="260" height="100" rx="10" fill="#f9f5ff" stroke="#d8b4fe"/>
+  <text x="240" y="205" font-family="Arial" font-size="12" fill="#6b7280" text-anchor="middle">Вхідне значення</text>
+  <text x="240" y="245" font-family="Arial" font-size="32" fill="#7c3aed" font-weight="bold" text-anchor="middle">100</text>
+  <text x="240" y="270" font-family="Arial" font-size="13" fill="#9ca3af" text-anchor="middle">кілометри (km)</text>
+  <text x="410" y="240" font-family="Arial" font-size="28" fill="#7c3aed" text-anchor="middle">→</text>
+  <rect x="430" y="185" width="240" height="100" rx="10" fill="#7c3aed"/>
+  <text x="550" y="205" font-family="Arial" font-size="12" fill="rgba(255,255,255,0.7)" text-anchor="middle">Результат</text>
+  <text x="550" y="245" font-family="Arial" font-size="32" fill="white" font-weight="bold" text-anchor="middle">62.14</text>
+  <text x="550" y="270" font-family="Arial" font-size="13" fill="rgba(255,255,255,0.8)" text-anchor="middle">милі (mi)</text>
+  <!-- History -->
+  <text x="110" y="315" font-family="Arial" font-size="13" fill="#6b7280">Історія конвертацій:</text>
+  <rect x="110" y="323" width="560" height="32" rx="6" fill="#f3f4f6"/>
+  <text x="125" y="344" font-family="Arial" font-size="12" fill="#374151">50 km → 31.07 mi</text>
+  <text x="655" y="344" font-family="Arial" font-size="11" fill="#9ca3af">10:41</text>
+  <rect x="110" y="361" width="560" height="32" rx="6" fill="#f3f0ff"/>
+  <text x="125" y="382" font-family="Arial" font-size="12" fill="#374151">200 km → 124.27 mi</text>
+  <text x="655" y="382" font-family="Arial" font-size="11" fill="#9ca3af">10:39</text>
+  <rect x="110" y="410" width="260" height="42" rx="10" fill="#7c3aed"/>
+  <text x="240" y="436" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Конвертувати →</text>
+  <rect x="390" y="410" width="280" height="42" rx="10" fill="#f3f0ff" stroke="#d8b4fe"/>
+  <text x="530" y="436" font-family="Arial" font-size="14" fill="#7c3aed" text-anchor="middle">Очистити</text>
+</svg>

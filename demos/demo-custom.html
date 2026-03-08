@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html lang="uk">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Демо: Індивідуальний інструмент</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: white; border-radius: 20px; box-shadow: 0 4px 32px rgba(124,58,237,0.12); width: 100%; max-width: 520px; overflow: hidden; }
+    .card-header { background: linear-gradient(135deg, #4c1d95, #7c3aed); color: white; padding: 22px 28px; }
+    .card-header h1 { font-size: 1.25em; font-weight: 800; margin-bottom: 4px; }
+    .card-header p { opacity: 0.75; font-size: 0.87em; }
+    .card-body { padding: 24px 28px; }
+    label { display: block; font-size: 0.82em; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+    .tool-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; }
+    .tab { padding: 7px 14px; border-radius: 20px; border: 1.5px solid #e5e7eb; background: white; color: #6b7280; font-size: 0.82em; cursor: pointer; transition: all 0.15s; }
+    .tab.active { background: #7c3aed; color: white; border-color: #7c3aed; }
+    select { width: 100%; padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 0.95em; color: #1f2937; outline: none; margin-bottom: 16px; }
+    select:focus { border-color: #7c3aed; }
+    .convert-row { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 10px; align-items: end; margin-bottom: 16px; }
+    .convert-row label { margin-bottom: 6px; }
+    .convert-row input { width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 1.1em; font-weight: 700; color: #1f2937; outline: none; }
+    .convert-row input:focus { border-color: #7c3aed; }
+    .convert-row input.result { background: #f9f5ff; border-color: #d8b4fe; color: #7c3aed; }
+    .arrow { text-align: center; font-size: 1.4em; color: #7c3aed; padding-bottom: 8px; }
+    .btn { width: 100%; padding: 13px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #6d28d9; }
+    .history { margin-top: 18px; }
+    .history h3 { font-size: 0.85em; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+    .history-list { display: flex; flex-direction: column; gap: 6px; max-height: 150px; overflow-y: auto; }
+    .history-item { background: #f9f5ff; border-radius: 8px; padding: 8px 12px; font-size: 0.82em; color: #374151; display: flex; justify-content: space-between; }
+    .history-item span { color: #9ca3af; font-size: 0.9em; }
+    .note { text-align:center; font-size:0.78em; color:#9ca3af; margin-top:14px; }
+    a { color: #7c3aed; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <h1>🔧 Індивідуальний інструмент</h1>
+    <p>Демо: Конвертер одиниць вимірювання</p>
+  </div>
+  <div class="card-body">
+    <div class="tool-tabs">
+      <button class="tab active" onclick="setCategory('length')">📏 Довжина</button>
+      <button class="tab" onclick="setCategory('weight')">⚖️ Вага</button>
+      <button class="tab" onclick="setCategory('temp')">🌡️ Температура</button>
+      <button class="tab" onclick="setCategory('area')">◼️ Площа</button>
+    </div>
+
+    <label>З одиниці</label>
+    <select id="fromUnit" onchange="convert()"></select>
+
+    <div class="convert-row">
+      <div>
+        <label>Значення</label>
+        <input type="number" id="fromVal" value="1" oninput="convert()" placeholder="0" />
+      </div>
+      <div class="arrow">→</div>
+      <div>
+        <label>Результат</label>
+        <input type="text" id="toVal" class="result" readonly placeholder="—" />
+      </div>
+    </div>
+
+    <label>В одиницю</label>
+    <select id="toUnit" onchange="convert()"></select>
+
+    <button class="btn" onclick="saveHistory()">Зберегти в історію</button>
+
+    <div class="history">
+      <h3>Історія</h3>
+      <div class="history-list" id="histList"></div>
+    </div>
+    <p class="note"><a href="../index.html">← Повернутись на сайт</a></p>
+  </div>
+</div>
+<script>
+var categories = {
+  length: {
+    units: ['Метри (m)','Кілометри (km)','Сантиметри (cm)','Міліметри (mm)','Милі (mi)','Ярди (yd)','Фути (ft)','Дюйми (in)'],
+    toBase: [1, 1000, 0.01, 0.001, 1609.34, 0.9144, 0.3048, 0.0254]
+  },
+  weight: {
+    units: ['Кілограми (kg)','Грами (g)','Тонни (t)','Фунти (lb)','Унції (oz)'],
+    toBase: [1, 0.001, 1000, 0.453592, 0.0283495]
+  },
+  temp: {
+    units: ['Цельсій (°C)','Фаренгейт (°F)','Кельвін (K)'],
+    toBase: null // special
+  },
+  area: {
+    units: ['м² (m²)','км² (km²)','га (ha)','акр (acre)','фут² (ft²)'],
+    toBase: [1, 1e6, 10000, 4046.86, 0.0929]
+  }
+};
+var currentCat = 'length';
+var history = [];
+
+function setCategory(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.remove('active'); });
+  event.target.classList.add('active');
+  populateUnits();
+  convert();
+}
+
+function populateUnits() {
+  var c = categories[currentCat];
+  ['fromUnit','toUnit'].forEach(function(id, idx) {
+    var sel = document.getElementById(id);
+    sel.innerHTML = '';
+    c.units.forEach(function(u, i) {
+      var opt = document.createElement('option'); opt.value = i; opt.textContent = u;
+      sel.appendChild(opt);
+    });
+    if(id==='toUnit') sel.selectedIndex = 1;
+  });
+}
+
+function convert() {
+  var cat = categories[currentCat];
+  var val = parseFloat(document.getElementById('fromVal').value);
+  var fi = +document.getElementById('fromUnit').value;
+  var ti = +document.getElementById('toUnit').value;
+  if(isNaN(val)) { document.getElementById('toVal').value = '—'; return; }
+
+  var result;
+  if(currentCat === 'temp') {
+    var c;
+    if(fi===0) c=val;
+    else if(fi===1) c=(val-32)*5/9;
+    else c=val-273.15;
+    if(ti===0) result=c;
+    else if(ti===1) result=c*9/5+32;
+    else result=c+273.15;
+  } else {
+    var base = val * cat.toBase[fi];
+    result = base / cat.toBase[ti];
+  }
+
+  var formatted = Math.abs(result) < 0.0001 ? result.toExponential(4) : parseFloat(result.toFixed(6)).toString();
+  document.getElementById('toVal').value = formatted;
+}
+
+function saveHistory() {
+  var fromUnit = document.getElementById('fromUnit').options[document.getElementById('fromUnit').selectedIndex].text;
+  var toUnit = document.getElementById('toUnit').options[document.getElementById('toUnit').selectedIndex].text;
+  var from = document.getElementById('fromVal').value;
+  var to = document.getElementById('toVal').value;
+  if(to === '—') return;
+  var now = new Date(); var t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  history.unshift({ text: from + ' ' + fromUnit + ' → ' + to + ' ' + toUnit, time: t });
+  if(history.length > 10) history.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  var list = document.getElementById('histList');
+  list.innerHTML = '';
+  history.forEach(function(h) {
+    var item = document.createElement('div'); item.className = 'history-item';
+    item.innerHTML = '<span class="text">' + h.text + '</span><span>' + h.time + '</span>';
+    list.appendChild(item);
+  });
+}
+
+populateUnits();
+convert();
+</script>
+</body>
+</html>
