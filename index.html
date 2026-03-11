@@ -7,6 +7,13 @@
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<link rel="stylesheet" href="assets/css/devbite.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			.button.small-btn {
+				display: inline-flex !important;
+				align-items: center !important;
+				justify-content: center !important;
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 
@@ -240,7 +247,7 @@
 									<ul class="contact">
 										<li>
 											<h3>Пошта</h3>
-											<a href="mailto:matthew.korenets@gmail.com">matthew.korenets@gmail.com</a>
+											<a href="/cdn-cgi/l/email-protection#0865697c7c606d7f2663677a6d666d7c7b486f65696164266b6765"><span class="__cf_email__" data-cfemail="117c7065657974663f7a7e63747f74656251767c70787d3f727e7c">[email&#160;protected]</span></a>
 										</li>
 										<li>
 											<h3>Telegram</h3>
@@ -275,7 +282,7 @@
 			</footer>
 
 		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
+			<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.scrollex.min.js"></script>
 			<script src="assets/js/jquery.scrolly.min.js"></script>
 			<script src="assets/js/browser.min.js"></script>
@@ -286,11 +293,4 @@
 			function sendContactEmail() {
 				var name = document.getElementById('name').value;
 				var message = document.getElementById('message').value;
-				var subject = encodeURIComponent('Загальна заявка від ' + name);
-				var body = encodeURIComponent('Ім\'я: ' + name + '\n\n' + message);
-				window.location.href = 'mailto:matthew.korenets@gmail.com?subject=' + subject + '&body=' + body;
-			}
-			</script>
-
-	</body>
-</html>
+				var subject = encodeURIComponent('З�
