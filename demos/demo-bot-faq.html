@@ -3,107 +3,734 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Демо: FAQ-бот</title>
+  <title>Telegram FAQ-бот</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .phone { background: #1f1f1f; border-radius: 40px; padding: 12px; width: 340px; box-shadow: 0 12px 48px rgba(0,0,0,0.3); }
-    .screen { background: #0f0f23; border-radius: 30px; overflow: hidden; }
-    .tg-header { background: #5b21b6; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
-    .bot-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .bot-info h3 { color: white; font-size: 0.9em; font-weight: 700; }
-    .bot-info p { color: rgba(255,255,255,0.7); font-size: 0.75em; }
-    .messages { padding: 12px; min-height: 360px; max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: #1a1a2e; }
-    .msg { max-width: 82%; padding: 9px 12px; border-radius: 16px; font-size: 0.82em; line-height: 1.5; }
-    .msg.bot { background: #2d2d4e; color: #e2e8f0; border-bottom-left-radius: 4px; align-self: flex-start; }
-    .msg.user { background: #5b21b6; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
-    .msg.typing { background: #2d2d4e; color: #9ca3af; align-self: flex-start; font-style: italic; }
-    .faq-list { padding: 10px 12px; background: #16213e; display: flex; flex-direction: column; gap: 6px; }
-    .faq-btn { background: #2d2d4e; color: #e2e8f0; border: 1px solid #3d3d6e; border-radius: 10px; padding: 10px 14px; font-size: 0.8em; cursor: pointer; text-align: left; transition: all 0.15s; }
-    .faq-btn:hover { background: #5b21b6; border-color: #7c3aed; }
-    .tg-input { background: #16213e; padding: 10px 12px; display: flex; gap: 8px; align-items: center; }
-    .tg-input input { flex: 1; background: #2d2d4e; border: none; border-radius: 20px; padding: 8px 14px; color: white; font-size: 0.82em; outline: none; }
-    .tg-input input::placeholder { color: #6b7280; }
-    .send-btn { background: #5b21b6; border: none; width: 32px; height: 32px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .notice { background: #fef3c7; border-left: 3px solid #f59e0b; padding: 10px 14px; font-size: 0.78em; color: #92400e; margin-top: 14px; border-radius: 0 8px 8px 0; max-width: 340px; }
-    .note { text-align:center; font-size:0.78em; color:#9ca3af; margin-top:10px; }
-    a { color: #7c3aed; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, 'Segoe UI', sans-serif;
+      background: #6d28d9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 320px;
+      background: #17212b;
+      border-radius: 44px;
+      padding: 12px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.07),
+        0 32px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.10);
+      position: relative;
+    }
+
+    /* Dynamic island */
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 26px;
+      background: #000;
+      border-radius: 14px;
+      z-index: 10;
+    }
+
+    .screen {
+      background: #17212b;
+      border-radius: 34px;
+      overflow: hidden;
+      height: 620px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      background: #232e3c;
+      padding: 52px 20px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .status-time {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-icons svg {
+      fill: #ffffff;
+    }
+
+    /* ── TG top bar ── */
+    .tg-header {
+      background: #232e3c;
+      padding: 8px 16px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+
+    .back-btn {
+      color: #5eabf0;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding-right: 2px;
+    }
+
+    .bot-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5eabf0, #3d8bd4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .bot-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .bot-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bot-status {
+      font-size: 12px;
+      color: #5eabf0;
+      margin-top: 1px;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .header-icons svg {
+      fill: #5eabf0;
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ── Chat background ── */
+    .chat-bg {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 10px;
+      background-color: #0e1621;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(94,171,240,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(94,171,240,0.03) 0%, transparent 50%);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-bg::-webkit-scrollbar { width: 0; }
+
+    /* ── Date separator ── */
+    .date-sep {
+      text-align: center;
+      margin: 6px 0 10px;
+    }
+
+    .date-sep span {
+      background: rgba(14,22,33,0.7);
+      color: #8a9aaa;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 10px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── Messages ── */
+    .msg-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .msg-row.bot { justify-content: flex-start; }
+    .msg-row.user { justify-content: flex-end; }
+
+    .msg-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5eabf0, #3d8bd4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+
+    .msg-avatar.hidden { visibility: hidden; }
+
+    .bubble {
+      max-width: 76%;
+      padding: 8px 12px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      position: relative;
+      word-break: break-word;
+    }
+
+    /* Bot bubble */
+    .msg-row.bot .bubble {
+      background: #232e3c;
+      color: #e8eaed;
+      border-bottom-left-radius: 4px;
+    }
+
+    /* User bubble */
+    .msg-row.user .bubble {
+      background: #2b5278;
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-time {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      float: right;
+      margin-left: 8px;
+      margin-top: 3px;
+      white-space: nowrap;
+    }
+
+    .msg-row.user .msg-time {
+      color: rgba(255,255,255,0.55);
+    }
+
+    /* Read ticks */
+    .ticks {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 3px;
+      vertical-align: middle;
+    }
+
+    .ticks svg {
+      width: 14px;
+      height: 10px;
+    }
+
+    /* Keyboard buttons inside bubble */
+    .kb-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .kb-btn {
+      background: rgba(94,171,240,0.14);
+      border: 1px solid rgba(94,171,240,0.22);
+      border-radius: 10px;
+      color: #5eabf0;
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 7px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .kb-btn:hover { background: rgba(94,171,240,0.24); }
+
+    /* Typing indicator */
+    .typing {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0 6px;
+    }
+
+    .typing .msg-avatar { }
+
+    .typing-dots {
+      background: #232e3c;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      padding: 10px 14px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #5eabf0;
+      animation: bounce 1.2s infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* ── Input bar ── */
+    .input-bar {
+      background: #232e3c;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .attach-btn {
+      color: #8a9aaa;
+      font-size: 20px;
+      cursor: pointer;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .input-field {
+      flex: 1;
+      background: #17212b;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 14px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      min-height: 36px;
+      resize: none;
+      line-height: 1.4;
+    }
+
+    .input-field::placeholder { color: #5a6a7a; }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #2b5278;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .send-btn:hover { background: #3a6898; }
+
+    .send-btn svg {
+      fill: #5eabf0;
+      width: 18px;
+      height: 18px;
+    }
+
+    .mic-btn {
+      color: #8a9aaa;
+      font-size: 20px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ── Bottom home indicator ── */
+    .home-indicator {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #17212b;
+    }
+
+    .home-bar {
+      width: 120px;
+      height: 4px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 2px;
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      margin-top: 24px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .back-link:hover { color: rgba(255,255,255,0.8); }
+
+    /* ── FAQ keyboard ── */
+    .kbd-area {
+      background: #1c2733;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+
+    .kbd-btn {
+      width: 100%;
+      background: #2b3e50;
+      color: #e4e6eb;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: background 0.13s;
+    }
+
+    .kbd-btn:hover { background: #2AABEE; color: #fff; }
   </style>
 </head>
 <body>
-<div style="text-align:center;">
+
 <div class="phone">
   <div class="screen">
-    <div class="tg-header">
-      <div class="bot-avatar">❓</div>
-      <div class="bot-info">
-        <h3>DevBite FAQ</h3>
-        <p>відповідає автоматично</p>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <!-- Signal -->
+        <svg width="16" height="12" viewBox="0 0 16 12">
+          <rect x="0" y="8" width="3" height="4" rx="0.5" opacity="1"/>
+          <rect x="4.5" y="5" width="3" height="7" rx="0.5" opacity="1"/>
+          <rect x="9" y="2" width="3" height="10" rx="0.5" opacity="1"/>
+          <rect x="13.5" y="0" width="2.5" height="12" rx="0.5" opacity="0.3"/>
+        </svg>
+        <!-- WiFi -->
+        <svg width="15" height="12" viewBox="0 0 15 12">
+          <path d="M7.5 9.5 a1.5 1.5 0 1 1 0 0.01" fill="white"/>
+          <path d="M4.5 7 Q7.5 4.5 10.5 7" stroke="white" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.85"/>
+          <path d="M2 4.5 Q7.5 0.5 13 4.5" stroke="white" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.55"/>
+        </svg>
+        <!-- Battery -->
+        <svg width="24" height="12" viewBox="0 0 24 12">
+          <rect x="0" y="1" width="20" height="10" rx="2" stroke="white" stroke-width="1" fill="none" opacity="0.35"/>
+          <rect x="1.5" y="2.5" width="16" height="7" rx="1.2" fill="white"/>
+          <path d="M21 4.5 v3 Q23 6 21 4.5" fill="white" opacity="0.4"/>
+        </svg>
       </div>
     </div>
-    <div class="messages" id="msgs"></div>
-    <div class="faq-list" id="faqList"></div>
-    <div class="tg-input">
-      <input id="userInput" placeholder="Задайте питання..." onkeydown="if(event.key==='Enter')sendMsg()" />
-      <button class="send-btn" onclick="sendMsg()">➤</button>
+
+    <!-- TG header -->
+    <div class="tg-header">
+      <div class="back-btn">‹</div>
+      <div class="bot-avatar">З</div>
+      <div class="bot-info">
+        <div class="bot-name">DevBite FAQ</div>
+        <div class="bot-status">бот</div>
+      </div>
+      <div class="header-icons">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 7.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="#5eabf0" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+      </div>
     </div>
+
+    <!-- Chat -->
+    <div class="chat-bg" id="chat">
+      <div class="date-sep"><span>Сьогодні</span></div>
+    </div>
+
+    <!-- FAQ buttons keyboard -->
+    <div class="kbd-area" id="kbd"></div>
+
+    <!-- Input bar -->
+    <div class="input-bar">
+      <span class="attach-btn">📎</span>
+      <input class="input-field" id="userInput" placeholder="Повідомлення" onkeydown="handleKey(event)"/>
+      <button class="send-btn" onclick="sendUserMsg()" id="sendBtn">
+        <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="#5eabf0" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
   </div>
+  <div class="home-indicator"><div class="home-bar"></div></div>
 </div>
-<div class="notice">⚠️ Реальна інтеграція ШІ потребує зовнішньої AI-моделі та оплати API.</div>
-<p class="note"><a href="../index.html">Повернутись на сайт</a></p>
-</div>
+
+<a class="back-link" href="../index.html">← Повернутись на сайт</a>
+
 <script>
-var faq = [
-  { q: "💰 Скільки коштує?", a: "Вартість залежить від послуги:\n• Telegram-бот від 500 ₴\n• Форма заявок від 800 ₴\n• Повний калькулятор від 1000 ₴\n\nТочна ціна — після обговорення задачі." },
-  { q: "⏱ Які терміни виконання?", a: "Стандартні терміни:\n• Прості інструменти: 3–5 днів\n• Середні проєкти: 7–10 днів\n• Складні: до 14 днів\n\nЄ опція прискореного виконання." },
-  { q: "📦 Що входить у послугу?", a: "У базову вартість входить:\n✅ Розробка інструменту\n✅ Тестування\n✅ Здача готового файлу\n\nДодатково: підтримка, документація, доопрацювання." },
-  { q: "📞 Як зв'язатись?", a: "Зв'язок зі мною:\n📧 matthew.korenets@gmail.com\n💬 Telegram: @fatboy_slimm\n📱 Телефон: +380 99 649 31 06" },
-  { q: "🔧 Які технології?", a: "Працюю з:\n• HTML / CSS / JavaScript\n• Python (боти, скрипти)\n• Telegram Bot API\n• AI API (OpenAI, Claude та ін.)" },
-];
+  var chat = document.getElementById('chat');
+  var input = document.getElementById('userInput');
 
-function addMsg(text, type, delay) {
+  /* ── FAQ data ── */
+  var faq = [
+    {
+      q: 'Скільки коштують послуги?',
+      a: 'Вартість залежить від складності задачі. Telegram-бот — від 800 грн, форма або калькулятор — від 500 грн, AI-інтеграція — від 1500 грн. Точна ціна після обговорення.'
+    },
+    {
+      q: 'Скільки часу займає розробка?',
+      a: 'Прості інструменти — 1-3 дні. Telegram-боти — 2-5 днів. Складніші проєкти з AI — від тижня. Завжди обговорюємо терміни заздалегідь.'
+    },
+    {
+      q: 'Що входить у вартість?',
+      a: 'Розробка, налаштування, тестування та здача готового продукту. Підтримка після здачі — 7 днів безкоштовно. Подальший супровід — за домовленістю.'
+    },
+    {
+      q: 'Як зв\'язатись?',
+      a: 'Пошта: matthew.korenets@gmail.com\nTelegram: @fatboy_slimm\nТелефон: +380 99 649 31 06'
+    },
+    {
+      q: 'Чи є приклади робіт?',
+      a: 'Так, на сайті є демо-версії кожного інструменту — можна протестувати перед замовленням.'
+    }
+  ];
+
+  /* ── Keyword map ── */
+  var keywords = [
+    { words: ['ціна','кошт','варт','скільки кошт'],  idx: 0 },
+    { words: ['термін','час','скільки дн','швидко'], idx: 1 },
+    { words: ['вход','включ','що отрим'],            idx: 2 },
+    { words: ['контакт','зв\'яз','телефон','пошт'],  idx: 3 },
+    { words: ['приклад','портфол','демо','роботи'],  idx: 4 }
+  ];
+
+
+
+  /* ── Helpers ── */
+  function scrollDown() {
+    setTimeout(function() { chat.scrollTop = chat.scrollHeight; }, 50);
+  }
+
+  function now() {
+    var d = new Date();
+    return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  function addBotMsg(text, buttons) {
+    var row = document.createElement('div');
+    row.className = 'msg-row bot';
+
+    var av = document.createElement('div');
+    av.className = 'msg-avatar';
+    av.textContent = 'З';
+
+    var bub = document.createElement('div');
+    bub.className = 'bubble';
+
+    // Handle newlines
+    var lines = text.split('\n');
+    lines.forEach(function(line, i) {
+      if (i > 0) bub.appendChild(document.createElement('br'));
+      bub.appendChild(document.createTextNode(line));
+    });
+
+    var timeEl = document.createElement('span');
+    timeEl.className = 'msg-time';
+    timeEl.textContent = now();
+    bub.appendChild(timeEl);
+
+    if (buttons) {
+      var kb = document.createElement('div');
+      kb.className = 'kb-buttons';
+      buttons.forEach(function(label) {
+        var btn = document.createElement('button');
+        btn.className = 'kb-btn';
+        btn.textContent = label;
+        btn.onclick = function() {
+          removeButtons();
+          addUserMsg(label);
+          handleAnswer(label);
+        };
+        kb.appendChild(btn);
+      });
+      bub.appendChild(kb);
+    }
+
+    row.appendChild(av);
+    row.appendChild(bub);
+    chat.appendChild(row);
+    scrollDown();
+  }
+
+  function addUserMsg(text) {
+    var row = document.createElement('div');
+    row.className = 'msg-row user';
+
+    var bub = document.createElement('div');
+    bub.className = 'bubble';
+    bub.textContent = text;
+
+    var timeEl = document.createElement('span');
+    timeEl.className = 'msg-time';
+    timeEl.innerHTML = now() + ' <span class="ticks"><svg viewBox="0 0 16 10" fill="none"><path d="M1 5l4 4L15 1" stroke="#5eabf0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 5l4 4" stroke="#5eabf0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    bub.appendChild(timeEl);
+
+    row.appendChild(bub);
+    chat.appendChild(row);
+    scrollDown();
+  }
+
+  function addTyping() {
+    var row = document.createElement('div');
+    row.className = 'typing';
+    row.id = 'typing';
+
+    var av = document.createElement('div');
+    av.className = 'msg-avatar';
+    av.textContent = 'З';
+
+    var dots = document.createElement('div');
+    dots.className = 'typing-dots';
+    for (var i = 0; i < 3; i++) {
+      var d = document.createElement('div');
+      d.className = 'dot';
+      dots.appendChild(d);
+    }
+
+    row.appendChild(av);
+    row.appendChild(dots);
+    chat.appendChild(row);
+    scrollDown();
+  }
+
+  function removeTyping() {
+    var t = document.getElementById('typing');
+    if (t) t.remove();
+  }
+
+  function removeButtons() {
+    chat.querySelectorAll('.kb-btn').forEach(function(b) {
+      b.disabled = true;
+      b.style.opacity = '0.45';
+      b.style.cursor = 'default';
+    });
+  }
+
+  /* ── Flow logic ── */
+  function showFaqButtons() {
+    var kb = document.getElementById('kbd');
+    kb.innerHTML = '';
+    faq.forEach(function(item, i) {
+      var btn = document.createElement('button');
+      btn.className = 'kbd-btn';
+      btn.textContent = item.q;
+      btn.onclick = function() { pickFaq(i); };
+      kb.appendChild(btn);
+    });
+  }
+
+  function pickFaq(idx) {
+    var item = faq[idx];
+    addUserMsg(item.q);
+    document.getElementById('kbd').innerHTML = '';
+    addTyping();
+    setTimeout(function() {
+      removeTyping();
+      addBotMsg(item.a, null);
+      showFaqButtons();
+    }, 900);
+  }
+
+  function handleAnswer(text) {
+    // keyword search
+    var lower = text.toLowerCase();
+    var matched = null;
+    for (var i = 0; i < keywords.length; i++) {
+      for (var j = 0; j < keywords[i].words.length; j++) {
+        if (lower.indexOf(keywords[i].words[j]) !== -1) {
+          matched = faq[keywords[i].idx];
+          break;
+        }
+      }
+      if (matched) break;
+    }
+    var reply = matched
+      ? matched.a
+      : 'Не знайшов готової відповіді. Скористайтесь кнопками нижче або напишіть нам: @fatboy_slimm';
+
+    document.getElementById('kbd').innerHTML = '';
+    addTyping();
+    setTimeout(function() {
+      removeTyping();
+      addBotMsg(reply, null);
+      showFaqButtons();
+    }, 900);
+  }
+
+  function sendUserMsg() {
+    var text = input.value.trim();
+    if (!text || input.disabled) return;
+    input.value = '';
+    addUserMsg(text);
+    handleAnswer(text);
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter') { e.preventDefault(); sendUserMsg(); }
+  }
+
+  /* ── Init ── */
   setTimeout(function() {
-    if(type==='typing'){ var m=document.createElement('div'); m.className='msg typing'; m.textContent='⌨️ друкує...'; document.getElementById('msgs').appendChild(m); scroll(); return; }
-    document.querySelectorAll('.msg.typing').forEach(function(e){e.remove();});
-    var m=document.createElement('div'); m.className='msg '+type; m.innerHTML=text.replace(/\n/g,'<br>');
-    document.getElementById('msgs').appendChild(m); scroll();
-  }, delay||0);
-}
+    addTyping();
+    setTimeout(function() {
+      removeTyping();
+      addBotMsg('Привіт! Я відповідаю на поширені запитання про DevBite.\n\nОберіть питання або напишіть своє:', null);
+      input.disabled = false;
+      showFaqButtons();
+    }, 800);
+  }, 300);
 
-function scroll() { var msgs=document.getElementById('msgs'); msgs.scrollTop=msgs.scrollHeight; }
-
-function renderFaq() {
-  var list=document.getElementById('faqList'); list.innerHTML='';
-  faq.forEach(function(item){
-    var btn=document.createElement('button'); btn.className='faq-btn'; btn.textContent=item.q;
-    btn.onclick=function(){ answerFaq(item); };
-    list.appendChild(btn);
-  });
-}
-
-function answerFaq(item) {
-  addMsg(item.q, 'user');
-  addMsg('','typing',400);
-  addMsg(item.a, 'bot', 1200);
-}
-
-function sendMsg() {
-  var val=document.getElementById('userInput').value.trim(); if(!val) return;
-  addMsg(val,'user'); document.getElementById('userInput').value='';
-  // Simple keyword matching
-  var lower=val.toLowerCase();
-  var answer=null;
-  if(lower.includes('ціна')||lower.includes('кошт')||lower.includes('варт')) answer=faq[0].a;
-  else if(lower.includes('терм')||lower.includes('час')||lower.includes('скільки дн')) answer=faq[1].a;
-  else if(lower.includes('вход')||lower.includes('включ')) answer=faq[2].a;
-  else if(lower.includes('контакт')||lower.includes('зв\'яз')||lower.includes('телефон')) answer=faq[3].a;
-  else if(lower.includes('технолог')||lower.includes('мова')||lower.includes('python')) answer=faq[4].a;
-  else answer='Не знайшов готової відповіді. Будь ласка, виберіть питання з меню нижче або зверніться безпосередньо:\n📧 matthew.korenets@gmail.com';
-  addMsg('','typing',600); addMsg(answer,'bot',1500);
-}
-
-addMsg('Привіт! 👋 Я FAQ-бот DevBite.\n\nОберіть питання або напишіть своє:','bot',800);
-setTimeout(renderFaq, 800);
+  input.disabled = true;
 </script>
+
 </body>
 </html>
