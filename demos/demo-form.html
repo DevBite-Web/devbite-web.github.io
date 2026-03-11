@@ -3,118 +3,322 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Демо: Форма заявок</title>
+  <title>Форма заявки</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .card { background: white; border-radius: 16px; box-shadow: 0 4px 32px rgba(124,58,237,0.12); width: 100%; max-width: 500px; overflow: hidden; }
-    .card-header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 24px 28px; }
-    .card-header h1 { font-size: 1.3em; font-weight: 700; margin-bottom: 4px; }
-    .card-header p { opacity: 0.8; font-size: 0.9em; }
-    .card-body { padding: 28px; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #6d28d9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .wrap { width: 100%; max-width: 460px; }
+
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+      overflow: hidden;
+    }
+
+    .header {
+      background: #7c3aed;
+      padding: 32px 36px;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .body { padding: 32px 36px 36px; }
+
     .field { margin-bottom: 16px; }
-    .field label { display: block; font-size: 0.82em; color: #6b7280; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-    .req { color: #7c3aed; }
-    .field input, .field select, .field textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 0.95em; color: #1f2937; background: white; transition: border-color 0.2s, box-shadow 0.2s; outline: none; font-family: inherit; }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.08); }
-    .field.error input, .field.error select, .field.error textarea { border-color: #ef4444; }
-    .field .err-msg { font-size: 0.78em; color: #ef4444; margin-top: 4px; display: none; }
-    .field.error .err-msg { display: block; }
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .field textarea { resize: none; height: 100px; }
-    .btn { display: block; width: 100%; padding: 14px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 4px; }
-    .btn:hover { background: #6d28d9; }
-    .success-block { display: none; text-align: center; padding: 30px; }
-    .success-icon { font-size: 3em; margin-bottom: 12px; }
-    .success-block h2 { color: #374151; font-size: 1.2em; margin-bottom: 8px; }
-    .success-block p { color: #6b7280; font-size: 0.9em; }
-    .reset-btn { margin-top: 20px; background: none; border: 1.5px solid #7c3aed; color: #7c3aed; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
-    .note { text-align:center; font-size:0.78em; color:#9ca3af; margin-top:14px; }
-    a { color: #7c3aed; }
+
+    .field-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .req { color: #7c3aed; margin-left: 2px; }
+
+    input[type="text"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #1f2937;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.18s;
+      font-family: inherit;
+      appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: #7c3aed; }
+
+    .field.has-error input,
+    .field.has-error select,
+    .field.has-error textarea { border-color: #ef4444; }
+
+    .err-msg {
+      display: none;
+      font-size: 11px;
+      color: #ef4444;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    .field.has-error .err-msg { display: block; }
+
+    .contact-hint {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237c3aed' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 44px;
+      cursor: pointer;
+    }
+
+    textarea {
+      resize: none;
+      height: 96px;
+      line-height: 1.5;
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #f3f4f6;
+      margin: 8px 0 24px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: #1f2937;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s;
+      font-family: inherit;
+      text-align: center;
+    }
+
+    .btn:hover { background: #111827; }
+
+    .success-block {
+      display: none;
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+
+    .success-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #7c3aed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+    }
+
+    .success-icon svg {
+      width: 24px; height: 24px;
+      stroke: white; fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .success-block h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .success-block p {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .reset-btn {
+      display: block;
+      margin: 20px auto 0;
+      font-size: 13px;
+      color: #7c3aed;
+      background: none;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #9ca3af;
+      text-decoration: none;
+    }
+
+    .back:hover { color: #7c3aed; }
   </style>
 </head>
 <body>
-<div class="card">
-  <div class="card-header">
-    <h1>📋 Форма заявки</h1>
-    <p>Заповніть форму — ми зв'яжемося з вами</p>
-  </div>
-  <div id="formBlock" class="card-body">
-    <div class="row-2">
-      <div class="field" id="f-name">
-        <label>Ім'я <span class="req">*</span></label>
-        <input id="name" type="text" placeholder="Ваше ім'я" />
-        <div class="err-msg">Будь ласка, введіть ім'я</div>
+
+<div class="wrap">
+  <div class="card">
+
+    <div class="header">
+      <h1>Форма заявки</h1>
+    </div>
+
+    <div class="body">
+
+      <div id="formBlock">
+
+        <div class="row2">
+          <div class="field" id="f-name">
+            <label class="field-label">Ім'я <span class="req">*</span></label>
+            <input id="name" type="text" placeholder="Ваше ім'я"/>
+            <div class="err-msg">Введіть ім'я</div>
+          </div>
+          <div class="field" id="f-service">
+            <label class="field-label">Послуга <span class="req">*</span></label>
+            <select id="service">
+              <option value="">Оберіть</option>
+              <option>Калькулятор</option>
+              <option>Календар бронювання</option>
+              <option>Telegram-бот</option>
+              <option>FAQ-бот</option>
+              <option>Форма заявок</option>
+              <option>Інтеграція ШІ</option>
+              <option>Прайс-лист</option>
+              <option>Чат-віджет</option>
+              <option>Інше</option>
+            </select>
+            <div class="err-msg">Оберіть послугу</div>
+          </div>
+        </div>
+
+        <div class="field" id="f-contact">
+          <label class="field-label">Контакт <span class="req">*</span></label>
+          <input id="contact" type="text" placeholder="+380 99 000 00 00 або @username"/>
+          <div class="err-msg">Введіть номер телефону або @username у Telegram</div>
+          <div class="contact-hint">Телефон або Telegram — як вам зручніше</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Коментар</label>
+          <textarea id="comment" placeholder="Опишіть деталі запиту..."></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <button class="btn" onclick="submitForm()">Надіслати заявку</button>
+
       </div>
-      <div class="field" id="f-phone">
-        <label>Телефон</label>
-        <input id="phone" type="tel" placeholder="+38 (0__) ___-__-__" />
+
+      <div id="successBlock" class="success-block">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Заявку надіслано</h2>
+        <p id="successText">Дякуємо! Ми зв'яжемось<br>з вами найближчим часом.</p>
+        <button class="reset-btn" onclick="resetForm()">Нова заявка</button>
       </div>
+
+      <a class="back" href="../index.html">Повернутись на сайт</a>
+
     </div>
-    <div class="field" id="f-email">
-      <label>Email <span class="req">*</span></label>
-      <input id="email" type="email" placeholder="your@email.com" />
-      <div class="err-msg">Введіть коректний email</div>
-    </div>
-    <div class="field" id="f-service">
-      <label>Послуга <span class="req">*</span></label>
-      <select id="service">
-        <option value="">— Оберіть послугу —</option>
-        <option>Калькулятор вартості</option>
-        <option>Календар бронювання</option>
-        <option>Telegram-бот для заявок</option>
-        <option>FAQ-бот</option>
-        <option>Форма заявок</option>
-        <option>Інтеграція ШІ</option>
-        <option>Прайс-лист</option>
-        <option>Чат-віджет</option>
-        <option>Індивідуальний інструмент</option>
-      </select>
-      <div class="err-msg">Оберіть послугу</div>
-    </div>
-    <div class="field">
-      <label>Коментар</label>
-      <textarea id="comment" placeholder="Опишіть деталі вашого запиту..."></textarea>
-    </div>
-    <button class="btn" onclick="submitForm()">Надіслати заявку →</button>
-    <p class="note"><a href="../index.html">Повернутись на сайт</a></p>
-  </div>
-  <div id="successBlock" class="success-block">
-    <div class="success-icon">✅</div>
-    <h2>Заявку надіслано!</h2>
-    <p>Дякуємо за ваше звернення.<br>Ми зв'яжемося з вами найближчим часом.</p>
-    <button class="reset-btn" onclick="reset()">← Нова заявка</button>
-    <p class="note" style="margin-top:16px"><a href="../index.html">Повернутись на сайт</a></p>
   </div>
 </div>
+
 <script>
-function validate(id, checkFn) {
-  var el = document.getElementById(id);
-  var field = document.getElementById('f-' + id);
-  if(!field) return true;
-  if(!checkFn(el.value)) { field.classList.add('error'); return false; }
-  field.classList.remove('error'); return true;
-}
-function submitForm() {
-  var ok = true;
-  ok = validate('name', function(v){ return v.trim().length >= 2; }) && ok;
-  ok = validate('email', function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }) && ok;
-  ok = validate('service', function(v){ return v !== ''; }) && ok;
-  if(!ok) return;
-  var name = document.getElementById('name').value;
-  var email = document.getElementById('email').value;
-  var service = document.getElementById('service').value;
-  var comment = document.getElementById('comment').value;
-  window.location.href = 'mailto:matthew.korenets@gmail.com?subject=' + encodeURIComponent('Заявка: ' + service) + '&body=' + encodeURIComponent('Ім\'я: ' + name + '\nEmail: ' + email + '\nПослуга: ' + service + '\n\n' + comment);
-  document.getElementById('formBlock').style.display = 'none';
-  document.getElementById('successBlock').style.display = 'block';
-}
-function reset() {
-  document.getElementById('formBlock').style.display = 'block';
-  document.getElementById('successBlock').style.display = 'none';
-  ['name','phone','email','comment'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('service').value = '';
-}
+  function validateContact(v) {
+    var phone = /^[\+\d][\d\s\-\(\)]{6,}$/.test(v.trim());
+    var tg    = /^@[a-zA-Z][a-zA-Z0-9_]{3,}$/.test(v.trim());
+    return phone || tg;
+  }
+
+  function setError(fieldId, isError) {
+    var f = document.getElementById('f-' + fieldId);
+    if (f) f.classList.toggle('has-error', isError);
+    return !isError;
+  }
+
+  function submitForm() {
+    var name    = document.getElementById('name').value.trim();
+    var service = document.getElementById('service').value;
+    var contact = document.getElementById('contact').value.trim();
+
+    var ok = true;
+    ok = setError('name',    name.length < 2)           && ok;
+    ok = setError('service', service === '')             && ok;
+    ok = setError('contact', !validateContact(contact)) && ok;
+
+    if (!ok) return;
+
+    document.getElementById('successText').innerHTML =
+      name + ', дякуємо за заявку!<br>Ми зв\'яжемось з вами найближчим часом.';
+
+    document.getElementById('formBlock').style.display    = 'none';
+    document.getElementById('successBlock').style.display = 'block';
+  }
+
+  function resetForm() {
+    ['name', 'contact', 'comment'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('service').value = '';
+    ['f-name', 'f-service', 'f-contact'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.remove('has-error');
+    });
+    document.getElementById('formBlock').style.display    = 'block';
+    document.getElementById('successBlock').style.display = 'none';
+  }
+
+  ['name', 'service', 'contact'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', function() {
+      var f = document.getElementById('f-' + id);
+      if (f) f.classList.remove('has-error');
+    });
+  });
 </script>
+
 </body>
 </html>
