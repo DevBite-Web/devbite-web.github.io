@@ -3,171 +3,417 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Демо: Індивідуальний інструмент</title>
+  <title>Перевірка паролю</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .card { background: white; border-radius: 20px; box-shadow: 0 4px 32px rgba(124,58,237,0.12); width: 100%; max-width: 520px; overflow: hidden; }
-    .card-header { background: linear-gradient(135deg, #4c1d95, #7c3aed); color: white; padding: 22px 28px; }
-    .card-header h1 { font-size: 1.25em; font-weight: 800; margin-bottom: 4px; }
-    .card-header p { opacity: 0.75; font-size: 0.87em; }
-    .card-body { padding: 24px 28px; }
-    label { display: block; font-size: 0.82em; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
-    .tool-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; }
-    .tab { padding: 7px 14px; border-radius: 20px; border: 1.5px solid #e5e7eb; background: white; color: #6b7280; font-size: 0.82em; cursor: pointer; transition: all 0.15s; }
-    .tab.active { background: #7c3aed; color: white; border-color: #7c3aed; }
-    select { width: 100%; padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 0.95em; color: #1f2937; outline: none; margin-bottom: 16px; }
-    select:focus { border-color: #7c3aed; }
-    .convert-row { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 10px; align-items: end; margin-bottom: 16px; }
-    .convert-row label { margin-bottom: 6px; }
-    .convert-row input { width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 1.1em; font-weight: 700; color: #1f2937; outline: none; }
-    .convert-row input:focus { border-color: #7c3aed; }
-    .convert-row input.result { background: #f9f5ff; border-color: #d8b4fe; color: #7c3aed; }
-    .arrow { text-align: center; font-size: 1.4em; color: #7c3aed; padding-bottom: 8px; }
-    .btn { width: 100%; padding: 13px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-    .btn:hover { background: #6d28d9; }
-    .history { margin-top: 18px; }
-    .history h3 { font-size: 0.85em; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
-    .history-list { display: flex; flex-direction: column; gap: 6px; max-height: 150px; overflow-y: auto; }
-    .history-item { background: #f9f5ff; border-radius: 8px; padding: 8px 12px; font-size: 0.82em; color: #374151; display: flex; justify-content: space-between; }
-    .history-item span { color: #9ca3af; font-size: 0.9em; }
-    .note { text-align:center; font-size:0.78em; color:#9ca3af; margin-top:14px; }
-    a { color: #7c3aed; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #6d28d9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .wrap { width: 100%; max-width: 460px; }
+
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+      overflow: hidden;
+    }
+
+    .header {
+      background: #7c3aed;
+      padding: 32px 36px;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .body { padding: 32px 36px 36px; }
+
+    /* ── Password field ── */
+    .field-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 48px 13px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #1f2937;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.18s;
+      font-family: inherit;
+      letter-spacing: 0.06em;
+    }
+
+    .input-wrap input:focus { border-color: #7c3aed; }
+
+    .toggle-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+
+    .toggle-btn:hover { color: #7c3aed; }
+    .toggle-btn svg { width: 18px; height: 18px; }
+
+    /* ── Strength bar ── */
+    .strength-section {
+      margin-top: 20px;
+    }
+
+    .strength-bar-wrap {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .bar-seg {
+      flex: 1;
+      height: 5px;
+      border-radius: 3px;
+      background: #f3f4f6;
+      transition: background 0.3s;
+    }
+
+    .strength-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-align: right;
+      transition: color 0.3s;
+      min-height: 16px;
+    }
+
+    /* ── Criteria list ── */
+    .divider {
+      height: 1px;
+      background: #f3f4f6;
+      margin: 24px 0;
+    }
+
+    .criteria {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .criterion {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      color: #9ca3af;
+      transition: color 0.2s;
+    }
+
+    .criterion.pass { color: #1f2937; }
+
+    .crit-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .criterion.pass .crit-icon {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+
+    .crit-icon svg {
+      width: 10px;
+      height: 10px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .criterion.pass .crit-icon svg { opacity: 1; }
+
+    /* ── Copy password ── */
+    .divider2 {
+      height: 1px;
+      background: #f3f4f6;
+      margin: 24px 0 20px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-generate {
+      flex: 1;
+      padding: 13px;
+      background: #f5f3ff;
+      color: #7c3aed;
+      border: 1.5px solid #e9d5ff;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-generate:hover { background: #ede9fe; border-color: #c4b5fd; }
+
+    .btn-copy {
+      flex: 1;
+      padding: 13px;
+      background: #1f2937;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s;
+      font-family: inherit;
+    }
+
+    .btn-copy:hover { background: #111827; }
+    .btn-copy:disabled { background: #d1d5db; cursor: default; }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+    }
+
+    .back:hover { color: rgba(255,255,255,0.85); }
   </style>
 </head>
 <body>
-<div class="card">
-  <div class="card-header">
-    <h1>🔧 Індивідуальний інструмент</h1>
-    <p>Демо: Конвертер одиниць вимірювання</p>
-  </div>
-  <div class="card-body">
-    <div class="tool-tabs">
-      <button class="tab active" onclick="setCategory('length')">📏 Довжина</button>
-      <button class="tab" onclick="setCategory('weight')">⚖️ Вага</button>
-      <button class="tab" onclick="setCategory('temp')">🌡️ Температура</button>
-      <button class="tab" onclick="setCategory('area')">◼️ Площа</button>
+
+<div class="wrap">
+  <div class="card">
+    <div class="header">
+      <h1>Перевірка паролю</h1>
     </div>
 
-    <label>З одиниці</label>
-    <select id="fromUnit" onchange="convert()"></select>
+    <div class="body">
 
-    <div class="convert-row">
-      <div>
-        <label>Значення</label>
-        <input type="number" id="fromVal" value="1" oninput="convert()" placeholder="0" />
+      <label class="field-label">Ваш пароль</label>
+      <div class="input-wrap">
+        <input type="password" id="pwInput" placeholder="Введіть пароль..." oninput="analyze()" autocomplete="off" spellcheck="false"/>
+        <button class="toggle-btn" onclick="toggleVis()" title="Показати/приховати">
+          <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
       </div>
-      <div class="arrow">→</div>
-      <div>
-        <label>Результат</label>
-        <input type="text" id="toVal" class="result" readonly placeholder="—" />
+
+      <!-- Strength bar -->
+      <div class="strength-section">
+        <div class="strength-bar-wrap" id="bars">
+          <div class="bar-seg" id="b0"></div>
+          <div class="bar-seg" id="b1"></div>
+          <div class="bar-seg" id="b2"></div>
+          <div class="bar-seg" id="b3"></div>
+        </div>
+        <div class="strength-label" id="strengthLabel"></div>
       </div>
+
+      <div class="divider"></div>
+
+      <!-- Criteria -->
+      <div class="criteria">
+        <div class="criterion" id="c-length">
+          <div class="crit-icon"><svg viewBox="0 0 12 10"><polyline points="1 5 4 8.5 11 1"/></svg></div>
+          Мінімум 8 символів
+        </div>
+        <div class="criterion" id="c-upper">
+          <div class="crit-icon"><svg viewBox="0 0 12 10"><polyline points="1 5 4 8.5 11 1"/></svg></div>
+          Велика літера (A–Z)
+        </div>
+        <div class="criterion" id="c-lower">
+          <div class="crit-icon"><svg viewBox="0 0 12 10"><polyline points="1 5 4 8.5 11 1"/></svg></div>
+          Мала літера (a–z)
+        </div>
+        <div class="criterion" id="c-digit">
+          <div class="crit-icon"><svg viewBox="0 0 12 10"><polyline points="1 5 4 8.5 11 1"/></svg></div>
+          Цифра (0–9)
+        </div>
+        <div class="criterion" id="c-special">
+          <div class="crit-icon"><svg viewBox="0 0 12 10"><polyline points="1 5 4 8.5 11 1"/></svg></div>
+          Спецсимвол (!@#$%^&*)
+        </div>
+      </div>
+
+      <div class="divider2"></div>
+
+      <div class="actions">
+        <button class="btn-generate" onclick="generate()">Згенерувати</button>
+        <button class="btn-copy" id="copyBtn" onclick="copyPw()" disabled>Скопіювати</button>
+      </div>
+
     </div>
-
-    <label>В одиницю</label>
-    <select id="toUnit" onchange="convert()"></select>
-
-    <button class="btn" onclick="saveHistory()">Зберегти в історію</button>
-
-    <div class="history">
-      <h3>Історія</h3>
-      <div class="history-list" id="histList"></div>
-    </div>
-    <p class="note"><a href="../index.html">← Повернутись на сайт</a></p>
   </div>
+  <a class="back" href="../index.html">Повернутись на сайт</a>
 </div>
+
 <script>
-var categories = {
-  length: {
-    units: ['Метри (m)','Кілометри (km)','Сантиметри (cm)','Міліметри (mm)','Милі (mi)','Ярди (yd)','Фути (ft)','Дюйми (in)'],
-    toBase: [1, 1000, 0.01, 0.001, 1609.34, 0.9144, 0.3048, 0.0254]
-  },
-  weight: {
-    units: ['Кілограми (kg)','Грами (g)','Тонни (t)','Фунти (lb)','Унції (oz)'],
-    toBase: [1, 0.001, 1000, 0.453592, 0.0283495]
-  },
-  temp: {
-    units: ['Цельсій (°C)','Фаренгейт (°F)','Кельвін (K)'],
-    toBase: null // special
-  },
-  area: {
-    units: ['м² (m²)','км² (km²)','га (ha)','акр (acre)','фут² (ft²)'],
-    toBase: [1, 1e6, 10000, 4046.86, 0.0929]
+  var input   = document.getElementById('pwInput');
+  var copyBtn = document.getElementById('copyBtn');
+  var visible = false;
+
+  var levels = [
+    { label: '',           color: '#f3f4f6' },
+    { label: 'Слабкий',   color: '#ef4444' },
+    { label: 'Середній',  color: '#f59e0b' },
+    { label: 'Добрий',    color: '#10b981' },
+    { label: 'Надійний',  color: '#7c3aed' },
+  ];
+
+  function check(pw) {
+    return {
+      length:  pw.length >= 8,
+      upper:   /[A-Z]/.test(pw),
+      lower:   /[a-z]/.test(pw),
+      digit:   /[0-9]/.test(pw),
+      special: /[^A-Za-z0-9]/.test(pw),
+    };
   }
-};
-var currentCat = 'length';
-var history = [];
 
-function setCategory(cat) {
-  currentCat = cat;
-  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.remove('active'); });
-  event.target.classList.add('active');
-  populateUnits();
-  convert();
-}
+  function score(c) {
+    if (!input.value) return 0;
+    var s = [c.length, c.upper, c.lower, c.digit, c.special]
+      .filter(Boolean).length;
+    // cap at 4 segments
+    if (s === 5) return 4;
+    if (s >= 3 && c.length) return 3;
+    if (s >= 2) return 2;
+    return 1;
+  }
 
-function populateUnits() {
-  var c = categories[currentCat];
-  ['fromUnit','toUnit'].forEach(function(id, idx) {
-    var sel = document.getElementById(id);
-    sel.innerHTML = '';
-    c.units.forEach(function(u, i) {
-      var opt = document.createElement('option'); opt.value = i; opt.textContent = u;
-      sel.appendChild(opt);
+  function analyze() {
+    var pw = input.value;
+    var c  = check(pw);
+    var s  = score(c);
+
+    // criteria
+    toggle('c-length',  c.length);
+    toggle('c-upper',   c.upper);
+    toggle('c-lower',   c.lower);
+    toggle('c-digit',   c.digit);
+    toggle('c-special', c.special);
+
+    // bar
+    var col = s > 0 ? levels[s].color : '#f3f4f6';
+    for (var i = 0; i < 4; i++) {
+      document.getElementById('b' + i).style.background = i < s ? col : '#f3f4f6';
+    }
+
+    // label
+    var lbl = document.getElementById('strengthLabel');
+    lbl.textContent = pw ? levels[s].label : '';
+    lbl.style.color = col;
+
+    // copy btn
+    copyBtn.disabled = !pw;
+  }
+
+  function toggle(id, pass) {
+    document.getElementById(id).classList.toggle('pass', pass);
+  }
+
+  function toggleVis() {
+    visible = !visible;
+    input.type = visible ? 'text' : 'password';
+    document.getElementById('eyeIcon').innerHTML = visible
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+
+  function generate() {
+    var chars = {
+      upper:   'ABCDEFGHJKLMNPQRSTUVWXYZ',
+      lower:   'abcdefghjkmnpqrstuvwxyz',
+      digit:   '23456789',
+      special: '!@#$%^&*-_=+?'
+    };
+    // guarantee one of each, then fill to 14
+    var pw = [
+      pick(chars.upper),
+      pick(chars.lower),
+      pick(chars.digit),
+      pick(chars.special),
+    ];
+    var all = chars.upper + chars.lower + chars.digit + chars.special;
+    for (var i = pw.length; i < 14; i++) pw.push(all[rand(all.length)]);
+    // shuffle
+    pw = pw.sort(function() { return Math.random() - 0.5; });
+    input.value = pw.join('');
+    if (!visible) input.type = 'text';
+    visible = true;
+    document.getElementById('eyeIcon').innerHTML =
+      '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    analyze();
+  }
+
+  function pick(s) { return s[rand(s.length)]; }
+  function rand(n) { return Math.floor(Math.random() * n); }
+
+  function copyPw() {
+    var pw = input.value;
+    if (!pw) return;
+    navigator.clipboard.writeText(pw).then(function() {
+      var orig = copyBtn.textContent;
+      copyBtn.textContent = 'Скопійовано';
+      copyBtn.style.background = '#7c3aed';
+      setTimeout(function() {
+        copyBtn.textContent = orig;
+        copyBtn.style.background = '';
+      }, 1800);
     });
-    if(id==='toUnit') sel.selectedIndex = 1;
-  });
-}
-
-function convert() {
-  var cat = categories[currentCat];
-  var val = parseFloat(document.getElementById('fromVal').value);
-  var fi = +document.getElementById('fromUnit').value;
-  var ti = +document.getElementById('toUnit').value;
-  if(isNaN(val)) { document.getElementById('toVal').value = '—'; return; }
-
-  var result;
-  if(currentCat === 'temp') {
-    var c;
-    if(fi===0) c=val;
-    else if(fi===1) c=(val-32)*5/9;
-    else c=val-273.15;
-    if(ti===0) result=c;
-    else if(ti===1) result=c*9/5+32;
-    else result=c+273.15;
-  } else {
-    var base = val * cat.toBase[fi];
-    result = base / cat.toBase[ti];
   }
-
-  var formatted = Math.abs(result) < 0.0001 ? result.toExponential(4) : parseFloat(result.toFixed(6)).toString();
-  document.getElementById('toVal').value = formatted;
-}
-
-function saveHistory() {
-  var fromUnit = document.getElementById('fromUnit').options[document.getElementById('fromUnit').selectedIndex].text;
-  var toUnit = document.getElementById('toUnit').options[document.getElementById('toUnit').selectedIndex].text;
-  var from = document.getElementById('fromVal').value;
-  var to = document.getElementById('toVal').value;
-  if(to === '—') return;
-  var now = new Date(); var t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-  history.unshift({ text: from + ' ' + fromUnit + ' → ' + to + ' ' + toUnit, time: t });
-  if(history.length > 10) history.pop();
-  renderHistory();
-}
-
-function renderHistory() {
-  var list = document.getElementById('histList');
-  list.innerHTML = '';
-  history.forEach(function(h) {
-    var item = document.createElement('div'); item.className = 'history-item';
-    item.innerHTML = '<span class="text">' + h.text + '</span><span>' + h.time + '</span>';
-    list.appendChild(item);
-  });
-}
-
-populateUnits();
-convert();
 </script>
+
 </body>
 </html>
