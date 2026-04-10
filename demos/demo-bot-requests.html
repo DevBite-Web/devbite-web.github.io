@@ -488,36 +488,32 @@
     {
       bot: 'Привіт! Я допомагаю оформити заявку. Як вас звати?',
       buttons: null,
-      key: null
+      key: 'name'   // user answers with their name at this step
     },
     {
-      bot: null, // dynamic, set after user answers
+      key: 'service',
       buttons: ['Консультація', 'Розробка сайту', 'Telegram-бот', 'Інше'],
-      key: 'name',
       botTemplate: function(a) { return 'Приємно, ' + a + '! Що вас цікавить?'; }
     },
     {
-      bot: null,
-      buttons: ['До 5 000 ₴', '5 000 – 15 000 ₴', 'Понад 15 000 ₴', 'Поки не визначився'],
-        key: 'service',
-      botTemplate: function(a) { return 'Зрозуміло. Який приблизний бюджет?'; }
-    },
-    {
-      bot: null,
-      buttons: null,
       key: 'budget',
-      botTemplate: function(a) { return 'Добре. Залиште ваш номер або Telegram, щоб ми могли зв\'язатись.'; }
+      buttons: ['До 5 000 ₴', '5 000 – 15 000 ₴', 'Понад 15 000 ₴', 'Поки не визначився'],
+      botTemplate: function(a) { return 'Добре. Який приблизний бюджет?'; }
     },
     {
-      bot: null,
-      buttons: null,
       key: 'contact',
+      buttons: null,
+      botTemplate: function(a) { return 'Чудово! Залиште номер або @username у Telegram, щоб ми могли зв\'язатись.'; }
+    },
+    {
+      key: null,
+      buttons: null,
       botTemplate: function(a) {
-        return '✅ Заявку отримано!\n\n' +
+        return 'Заявку отримано!\n\n' +
           'Ім\'я: ' + answers.name + '\n' +
           'Послуга: ' + answers.service + '\n' +
           'Бюджет: ' + answers.budget + '\n' +
-          'Контакт: ' + a + '\n\n' +
+          'Контакт: ' + answers.contact + '\n\n' +
           'Ми зв\'яжемось з вами найближчим часом.';
       },
       final: true
@@ -636,12 +632,12 @@
 
   /* ── Flow logic ── */
   function handleAnswer(text) {
-    if (step >= flow.length) return;
-
     var current = flow[step];
-    if (current.key) answers[current.key] = text;
-    step++;
 
+    // Save answer for this step
+    if (current.key) answers[current.key] = text;
+
+    step++;
     if (step >= flow.length) return;
 
     var next = flow[step];
@@ -650,7 +646,7 @@
     addTyping();
     setTimeout(function() {
       removeTyping();
-      addBotMsg(botText, next.buttons);
+      addBotMsg(botText, next.buttons || null);
       if (next.final) {
         input.disabled = true;
         input.placeholder = 'Заявку надіслано';
@@ -668,9 +664,9 @@
 
   function sendUserMsg() {
     var text = input.value.trim();
-    if (!text || step === 0 || input.disabled) return;
+    if (!text || input.disabled) return;
 
-    // Contact validation at step 4 (key: 'contact')
+    // Contact validation
     if (flow[step] && flow[step].key === 'contact') {
       if (!validateContact(text)) {
         showInputError('Введіть номер телефону або @username у Telegram');
@@ -712,8 +708,7 @@
     setTimeout(function() {
       removeTyping();
       addBotMsg(flow[0].bot, null);
-      step = 1;
-      // enable user input after first bot message
+      // step stays 0 — user's first reply is the answer to flow[0]
       input.disabled = false;
     }, 800);
   }, 300);
