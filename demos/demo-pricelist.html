@@ -3,114 +3,457 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Демо: Прайс-лист</title>
+  <title>Прайс-лист</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; min-height: 100vh; padding: 30px 20px; }
-    h1 { text-align: center; color: #1f2937; font-size: 1.8em; margin-bottom: 8px; }
-    .subtitle { text-align: center; color: #6b7280; margin-bottom: 24px; font-size: 0.95em; }
-    .toggle-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 32px; }
-    .toggle-label { color: #6b7280; font-size: 0.9em; font-weight: 600; }
-    .toggle-label.active { color: #7c3aed; }
-    .toggle { width: 52px; height: 28px; background: #7c3aed; border-radius: 14px; cursor: pointer; position: relative; transition: background 0.2s; }
-    .toggle-knob { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
-    .toggle.yearly .toggle-knob { transform: translateX(24px); }
-    .badge { background: #d1fae5; color: #065f46; font-size: 0.72em; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
-    .cards { display: flex; gap: 20px; max-width: 900px; margin: 0 auto; flex-wrap: wrap; justify-content: center; }
-    .card { background: white; border: 2px solid #e5e7eb; border-radius: 20px; padding: 28px 24px; flex: 1; min-width: 220px; max-width: 260px; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,58,237,0.12); }
-    .card.popular { border-color: #7c3aed; transform: scale(1.03); box-shadow: 0 8px 32px rgba(124,58,237,0.2); }
-    .popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; font-size: 0.75em; font-weight: 700; padding: 4px 16px; border-radius: 20px; white-space: nowrap; }
-    .plan-name { font-size: 1.1em; font-weight: 700; color: #374151; margin-bottom: 6px; }
-    .plan-desc { font-size: 0.82em; color: #9ca3af; margin-bottom: 20px; }
-    .price { font-size: 2.4em; font-weight: 800; color: #7c3aed; line-height: 1; }
-    .price sup { font-size: 0.4em; vertical-align: top; margin-top: 0.4em; color: #9ca3af; }
-    .price-period { font-size: 0.8em; color: #9ca3af; margin-bottom: 20px; margin-top: 4px; }
-    .features { list-style: none; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
-    .features li { font-size: 0.87em; color: #374151; display: flex; align-items: center; gap: 8px; }
-    .features li .check { color: #7c3aed; font-weight: 700; font-size: 1em; }
-    .features li .cross { color: #d1d5db; }
-    .btn { display: block; width: 100%; padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; border: 2px solid #7c3aed; background: white; color: #7c3aed; transition: all 0.2s; text-align: center; text-decoration: none; }
-    .btn:hover, .card.popular .btn { background: #7c3aed; color: white; }
-    .note { text-align:center; font-size:0.78em; color:#9ca3af; margin-top:24px; }
-    a { color: #7c3aed; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #6d28d9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 460px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #7c3aed;
+      padding: 32px 36px;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    /* ── Body ── */
+    .body {
+      padding: 28px 36px 36px;
+    }
+
+    /* ── Category tabs ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 9px 6px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+      text-align: center;
+    }
+
+    .tab.active {
+      background: #7c3aed;
+      border-color: #7c3aed;
+      color: #ffffff;
+    }
+
+    .tab:hover:not(.active) {
+      border-color: #7c3aed;
+      color: #7c3aed;
+    }
+
+    /* ── Price items ── */
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item {
+      border: 1.5px solid #f3f4f6;
+      border-radius: 12px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+
+    .item:hover {
+      border-color: #c4b5fd;
+      background: #faf8ff;
+    }
+
+    .item.selected {
+      border-color: #7c3aed;
+      background: #f5f3ff;
+    }
+
+    .item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* custom checkbox */
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1.5px solid #e5e7eb;
+      background: #ffffff;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .item.selected .checkbox {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+
+    .checkbox svg {
+      width: 12px;
+      height: 12px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+      transition: opacity 0.12s;
+    }
+
+    .item.selected .checkbox svg { opacity: 1; }
+
+    .item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .item-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: #7c3aed;
+      white-space: nowrap;
+    }
+
+    .item-desc {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 4px;
+      padding-left: 32px;
+      line-height: 1.5;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: #f3f4f6;
+      margin: 24px 0;
+    }
+
+    /* ── Total ── */
+    .total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .total-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+
+    .total-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    .total-value span {
+      font-size: 15px;
+      font-weight: 600;
+      color: #9ca3af;
+      margin-right: 4px;
+    }
+
+    /* ── Button ── */
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: #1f2937;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s;
+      font-family: inherit;
+      text-align: center;
+    }
+
+    .btn:hover { background: #111827; }
+    .btn:disabled { background: #d1d5db; cursor: default; }
+
+    /* ── Success ── */
+    .success-block {
+      display: none;
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+
+    .success-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #7c3aed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+    }
+
+    .success-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .success-block h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .success-block p {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .reset-btn {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #7c3aed;
+      background: none;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* ── Back ── */
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+    }
+
+    .back:hover { color: rgba(255,255,255,0.85); }
   </style>
 </head>
 <body>
-  <h1>Прайс-лист</h1>
-  <p class="subtitle">Оберіть план, що підходить для вашого бізнесу</p>
 
-  <div class="toggle-row">
-    <span class="toggle-label active" id="monthLabel">Одноразово</span>
-    <div class="toggle" id="toggleBtn" onclick="togglePeriod()">
-      <div class="toggle-knob"></div>
-    </div>
-    <span class="toggle-label" id="yearLabel">З підтримкою</span>
-    <span class="badge" id="saveBadge" style="display:none">Економія 20%</span>
-  </div>
+<div class="wrap">
+  <div class="card">
 
-  <div class="cards">
-    <div class="card">
-      <div class="plan-name">Стартовий</div>
-      <div class="plan-desc">Для простих задач</div>
-      <div class="price"><sup>₴</sup><span id="p1">500</span></div>
-      <div class="price-period" id="pp1">одноразово</div>
-      <ul class="features">
-        <li><span class="check">✓</span> 1 основна функція</li>
-        <li><span class="check">✓</span> Базова підтримка</li>
-        <li><span class="check">✓</span> Готовий файл</li>
-        <li><span class="cross">✗</span> Доопрацювання</li>
-        <li><span class="cross">✗</span> Документація</li>
-      </ul>
-      <a href="mailto:matthew.korenets@gmail.com?subject=Замовлення: Стартовий план" class="btn">Обрати план</a>
+    <div class="header">
+      <h1>Прайс-лист</h1>
     </div>
 
-    <div class="card popular">
-      <div class="popular-badge">✦ ПОПУЛЯРНИЙ</div>
-      <div class="plan-name">Оптимальний</div>
-      <div class="plan-desc">Найкращий вибір</div>
-      <div class="price"><sup>₴</sup><span id="p2">1500</span></div>
-      <div class="price-period" id="pp2">одноразово</div>
-      <ul class="features">
-        <li><span class="check">✓</span> До 5 функцій</li>
-        <li><span class="check">✓</span> Пріоритетна підтримка</li>
-        <li><span class="check">✓</span> Готовий файл</li>
-        <li><span class="check">✓</span> 1 доопрацювання</li>
-        <li><span class="cross">✗</span> Документація</li>
-      </ul>
-      <a href="mailto:matthew.korenets@gmail.com?subject=Замовлення: Оптимальний план" class="btn">Обрати план</a>
-    </div>
+    <div class="body">
 
-    <div class="card">
-      <div class="plan-name">Преміум</div>
-      <div class="plan-desc">Повний пакет</div>
-      <div class="price"><sup>₴</sup><span id="p3">3000</span></div>
-      <div class="price-period" id="pp3">одноразово</div>
-      <ul class="features">
-        <li><span class="check">✓</span> Без обмежень</li>
-        <li><span class="check">✓</span> 3 місяці підтримки</li>
-        <li><span class="check">✓</span> Готовий файл</li>
-        <li><span class="check">✓</span> 3 доопрацювання</li>
-        <li><span class="check">✓</span> Документація</li>
-      </ul>
-      <a href="mailto:matthew.korenets@gmail.com?subject=Замовлення: Преміум план" class="btn">Обрати план</a>
+      <div id="mainBlock">
+        <!-- Tabs -->
+        <div class="tabs" id="tabs"></div>
+
+        <!-- Items -->
+        <div class="items" id="items"></div>
+
+        <div class="divider"></div>
+
+        <!-- Total -->
+        <div class="total-row">
+          <div class="total-label">До оплати</div>
+          <div class="total-value"><span>₴</span><span id="totalVal">0</span></div>
+        </div>
+
+        <button class="btn" id="orderBtn" disabled onclick="order()">Замовити</button>
+      </div>
+
+      <div class="success-block" id="successBlock">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Заявку надіслано</h2>
+        <p id="successText"></p>
+        <button class="reset-btn" onclick="resetAll()">Обрати ще</button>
+      </div>
+
     </div>
   </div>
-  <p class="note"><a href="../index.html">← Повернутись на сайт</a></p>
+  <a class="back" href="../index.html">Повернутись на сайт</a>
+</div>
+
 <script>
-var yearly = false;
-var prices = { monthly:[500,1500,3000], yearly:[400,1200,2400] };
-function togglePeriod(){
-  yearly = !yearly;
-  var btn = document.getElementById('toggleBtn');
-  btn.classList.toggle('yearly', yearly);
-  document.getElementById('monthLabel').classList.toggle('active', !yearly);
-  document.getElementById('yearLabel').classList.toggle('active', yearly);
-  document.getElementById('saveBadge').style.display = yearly ? 'inline' : 'none';
-  var p = yearly ? prices.yearly : prices.monthly;
-  var period = yearly ? '/міс (з підтримкою)' : 'одноразово';
-  [1,2,3].forEach(function(i){ document.getElementById('p'+i).textContent=p[i-1]; document.getElementById('pp'+i).textContent=period; });
-}
+  var catalog = [
+    {
+      cat: 'Боти',
+      items: [
+        { name: 'Telegram-бот для заявок', price: 1200, desc: 'Автоматичний збір заявок через Telegram з повідомленнями вам' },
+        { name: 'FAQ-бот',                 price: 900,  desc: 'Відповіді на часті запитання без участі людини' },
+        { name: 'Бот з AI-відповідями',    price: 2200, desc: 'Інтелектуальний бот на базі GPT для складних запитів' },
+      ]
+    },
+    {
+      cat: 'Сайт',
+      items: [
+        { name: 'Форма заявок',        price: 600,  desc: 'Зручна форма з валідацією та надсиланням на пошту' },
+        { name: 'Калькулятор вартості', price: 800,  desc: 'Інтерактивний розрахунок ціни для вашого бізнесу' },
+        { name: 'Календар бронювання', price: 1000, desc: 'Онлайн-запис із вибором дати та часу' },
+        { name: 'Чат-віджет',          price: 700,  desc: 'Плаваюча кнопка підтримки на будь-якій сторінці' },
+      ]
+    },
+    {
+      cat: 'AI',
+      items: [
+        { name: 'AI-асистент на сайт', price: 2500, desc: 'Чат-бот з навчанням на вашому контенті' },
+        { name: 'Генерація контенту',  price: 1500, desc: 'Автоматичне створення текстів, описів, відповідей' },
+        { name: 'Аналіз заявок',       price: 1800, desc: 'AI розбирає вхідні запити і розподіляє по темах' },
+      ]
+    }
+  ];
+
+  var selected = {};   // key = "cat:idx", value = item
+  var activeTab = 0;
+
+  /* ── Build tabs ── */
+  var tabsEl  = document.getElementById('tabs');
+  var itemsEl = document.getElementById('items');
+
+  catalog.forEach(function(cat, ci) {
+    var btn = document.createElement('button');
+    btn.className = 'tab' + (ci === 0 ? ' active' : '');
+    btn.textContent = cat.cat;
+    btn.onclick = function() { switchTab(ci); };
+    tabsEl.appendChild(btn);
+  });
+
+  function switchTab(ci) {
+    activeTab = ci;
+    tabsEl.querySelectorAll('.tab').forEach(function(t, i) {
+      t.classList.toggle('active', i === ci);
+    });
+    renderItems();
+  }
+
+  function renderItems() {
+    itemsEl.innerHTML = '';
+    catalog[activeTab].items.forEach(function(item, i) {
+      var key = activeTab + ':' + i;
+      var div = document.createElement('div');
+      div.className = 'item' + (selected[key] ? ' selected' : '');
+      div.innerHTML =
+        '<div class="item-top">' +
+          '<div class="item-left">' +
+            '<div class="checkbox">' +
+              '<svg viewBox="0 0 12 10"><polyline points="1 5 4.5 8.5 11 1"/></svg>' +
+            '</div>' +
+            '<div class="item-name">' + item.name + '</div>' +
+          '</div>' +
+          '<div class="item-price">від ' + item.price.toLocaleString('uk-UA') + ' ₴</div>' +
+        '</div>' +
+        '<div class="item-desc">' + item.desc + '</div>';
+
+      div.onclick = function() { toggle(key, item, div); };
+      itemsEl.appendChild(div);
+    });
+  }
+
+  function toggle(key, item, el) {
+    if (selected[key]) {
+      delete selected[key];
+      el.classList.remove('selected');
+    } else {
+      selected[key] = item;
+      el.classList.add('selected');
+    }
+    updateTotal();
+  }
+
+  function updateTotal() {
+    var total = 0;
+    Object.values(selected).forEach(function(item) { total += item.price; });
+    document.getElementById('totalVal').textContent = total.toLocaleString('uk-UA');
+    document.getElementById('orderBtn').disabled = total === 0;
+  }
+
+  function order() {
+    var names = Object.values(selected).map(function(i) { return i.name; });
+    var total = 0;
+    Object.values(selected).forEach(function(i) { total += i.price; });
+    document.getElementById('mainBlock').style.display = 'none';
+    document.getElementById('successBlock').style.display = 'block';
+    document.getElementById('successText').innerHTML =
+      'Обрано: ' + names.join(', ') + '.<br>Загалом від ' +
+      total.toLocaleString('uk-UA') + ' ₴.<br>Ми зв\'яжемось з вами найближчим часом.';
+  }
+
+  function resetAll() {
+    selected = {};
+    activeTab = 0;
+    tabsEl.querySelectorAll('.tab').forEach(function(t, i) {
+      t.classList.toggle('active', i === 0);
+    });
+    renderItems();
+    updateTotal();
+    document.getElementById('mainBlock').style.display = 'block';
+    document.getElementById('successBlock').style.display = 'none';
+  }
+
+  renderItems();
 </script>
+
 </body>
 </html>
